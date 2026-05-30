@@ -369,6 +369,16 @@ css:{br:'#871C18',brDark:'#6A1614',bg:'#F5F4F2',bgWarm:'#EEEDE9',border:'#E0DDD8
 // Logo store - images embedded as base64 (set at runtime from user-uploaded logos)
 const LOGOS={};
 
+function toast(msg,type){
+  const el=document.getElementById('toast');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.background=type==='err'?'#c0392b':type==='ok'?'var(--header-bg)':'var(--text)';
+  el.style.opacity='1';
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.style.opacity='0';},3000);
+}
+
 function setBrand(key){
   const cfg=BRAND_CONFIG[key];
   if(!cfg)return;
@@ -797,6 +807,7 @@ document.getElementById('propCheck').addEventListener('change',updateTotals);
 document.getElementById('bpdf').addEventListener('click',generatePDF);
 // Guardar Cotizacion
 document.getElementById('bsave').addEventListener('click', async () => {
+  const brandKey=document.getElementById('brandSel').value;
   if(!brandKey){toast('Selecciona una marca primero.','err');return;}
   if(!quote.length){toast('Agrega al menos un producto.','err');return;}
   const cNombre=document.getElementById('cNombre').value.trim();
