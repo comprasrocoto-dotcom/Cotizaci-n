@@ -254,7 +254,8 @@ const BRAND_CONFIG={
   'TARIFA ROCOTO':{
     name:'Rocoto',
     shortCode:'ROC',
-    col:[139,0,20],col2:[100,0,15],
+    col:[22,22,22],col2:[10,10,10],
+    accent:[212,160,23],
     logoKey:'logo_rocoto',
     razonSocial:'Rocoto Cocina Peruana',
     nit:'',
@@ -283,9 +284,13 @@ function setBrand(key){
   if(!cfg)return;
   const [r1,g1,b1]=cfg.col;
   const [r2,g2,b2]=cfg.col2;
+  const acc=cfg.accent||cfg.col;
+  const [a1,a2,a3]=acc;
   const r=document.documentElement;
-  r.style.setProperty('--br','rgb('+r1+','+g1+','+b1+')');
-  r.style.setProperty('--br2','rgb('+r2+','+g2+','+b2+')');
+  r.style.setProperty('--br','rgb('+a1+','+a2+','+a3+')');
+  r.style.setProperty('--br2','rgb('+r1+','+g1+','+b1+')');
+  const hdr=document.getElementById('hdr');
+  if(hdr)hdr.style.background='linear-gradient(135deg,rgb('+r1+','+g1+','+b1+'),rgb('+r2+','+g2+','+b2+'))';
   document.getElementById('htitle').textContent='Cotizaciones '+cfg.name;
   updateQuoteNumberBadge(key);
 }
@@ -456,6 +461,7 @@ async function generatePDF(){
   const brandKey=bSel.value;
   const cfg=BRAND_CONFIG[brandKey]||BRAND_CONFIG['TARIFA MALANGA'];
   const col=cfg.col;
+  const pdfAccent=cfg.accent||cfg.col;
 
   // Client data
   const cNombre=(document.getElementById('cNombre').value||'').trim()||'Sin especificar';
@@ -522,9 +528,10 @@ async function generatePDF(){
   doc.setDrawColor(...col);
   doc.setLineWidth(0.4);
   doc.rect(12,y,186,32);
-  doc.setFillColor(...col);
+  doc.setFillColor(...pdfAccent);
   doc.rect(12,y,42,7,'F');
-  doc.setTextColor(255,255,255);
+  const cbarBright=(pdfAccent[0]*299+pdfAccent[1]*587+pdfAccent[2]*114)/1000;
+  doc.setTextColor(cbarBright>128?30:255,cbarBright>128?20:255,cbarBright>128?5:255);
   doc.setFontSize(7.5);
   doc.setFont(undefined,'bold');
   doc.text('DATOS DEL CLIENTE',14,y+5);
@@ -549,7 +556,7 @@ async function generatePDF(){
     startY:y,
     head:[['Producto','Cant.','Precio Unit.','Subtotal']],
     body,
-    headStyles:{fillColor:col,textColor:[255,255,255],fontStyle:'bold',fontSize:9},
+    headStyles:{fillColor:pdfAccent,textColor:(pdfAccent[0]>100&&pdfAccent[1]>100&&pdfAccent[2]<100)?[30,20,5]:[255,255,255],fontStyle:'bold',fontSize:9},
     bodyStyles:{fontSize:9},
     alternateRowStyles:{fillColor:[248,248,248]},
     columnStyles:{1:{cellWidth:16,halign:'center'},2:{cellWidth:32,halign:'right'},3:{cellWidth:32,halign:'right'}},
@@ -580,11 +587,13 @@ async function generatePDF(){
   let ty=y+5;
   totLines.forEach(line=>{
     if(line.highlight){
-      doc.setFillColor(...col);
+      doc.setFillColor(...pdfAccent);
       doc.rect(boxX,ty-4,boxW,lineH+1,'F');
-      doc.setTextColor(255,255,255);
+      // Use dark text on light accent (e.g. gold), white on dark accent
+      const accentBrightness=(pdfAccent[0]*299+pdfAccent[1]*587+pdfAccent[2]*114)/1000;
+      doc.setTextColor(accentBrightness>128?30:255,accentBrightness>128?20:255,accentBrightness>128?5:255);
     }else if(line.orange){doc.setTextColor(230,126,34);
-    }else if(line.green){doc.setTextColor(...col);
+    }else if(line.green){doc.setTextColor(...pdfAccent);
     }else if(line.gray){doc.setTextColor(140,140,140);
     }else{doc.setTextColor(50,50,50);}
     doc.setFontSize(line.highlight?9.5:8);
