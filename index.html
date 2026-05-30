@@ -14,7 +14,6 @@ header{background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;paddin
 .hlogo{display:flex;align-items:center;gap:10px}
 .hlogo h1{font-size:1.15rem;font-weight:700}
 .hlogo small{font-size:.75rem;opacity:.8;display:block}
-/* Top filters bar */
 .filters-bar{display:flex;gap:10px;padding:14px 24px;background:var(--card);border-bottom:2px solid var(--border);flex-wrap:wrap;align-items:center;position:sticky;top:62px;z-index:90;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .filter-group{display:flex;flex-direction:column;gap:3px;min-width:140px;flex:1;max-width:260px}
 .filter-group label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
@@ -25,14 +24,12 @@ header{background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;paddin
 .search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;outline:none;background:#f9f9f9;transition:border-color .2s}
 .search-wrap input:focus{border-color:var(--br);background:#fff}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-/* Main layout */
-main{max-width:1320px;margin:0 auto;padding:20px 20px;display:grid;grid-template-columns:1fr 390px;gap:20px;align-items:start}
+main{max-width:1320px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 410px;gap:20px;align-items:start}
 @media(max-width:980px){main{grid-template-columns:1fr;padding:12px}}
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 .ch{padding:13px 20px;background:linear-gradient(90deg,var(--br),var(--br2));color:#fff;display:flex;align-items:center;gap:9px}
 .ch h2{font-size:.97rem;font-weight:700}
 .ch .badge{margin-left:auto;background:rgba(255,255,255,.25);border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700}
-/* Products table */
 .ptw{padding:0;max-height:calc(100vh - 200px);overflow:auto}
 .pt{width:100%;border-collapse:collapse;font-size:.85rem}
 .pt thead th{text-align:left;padding:9px 14px;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border);position:sticky;top:0;background:#fff;white-space:nowrap}
@@ -49,14 +46,20 @@ main{max-width:1320px;margin:0 auto;padding:20px 20px;display:grid;grid-template
 .msg{text-align:center;padding:40px 18px;color:var(--muted);font-size:.93rem}
 .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--br);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:8px}
 @keyframes sp{to{transform:rotate(360deg)}}
-/* Quote panel */
 .qpanel{position:sticky;top:130px}
 .qpanel .ch{background:linear-gradient(90deg,#1a1a2e,#16213e)}
-.cs{padding:12px 16px 10px;border-bottom:1px solid var(--border)}
-.cs label{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.cs input,.cs textarea{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.86rem;outline:none;font-family:inherit}
-.cs input:focus,.cs textarea:focus{border-color:var(--br)}
-.cs textarea{resize:vertical;min-height:54px}
+/* Client form section */
+.cform{padding:14px 16px;border-bottom:1px solid var(--border);background:#fafefe}
+.cform h3{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cform-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cf{display:flex;flex-direction:column;gap:3px}
+.cf.full{grid-column:1/-1}
+.cf label{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.cf input,.cf textarea{padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.83rem;outline:none;font-family:inherit;background:#fff;transition:border-color .2s}
+.cf input:focus,.cf textarea:focus{border-color:var(--br)}
+.cf textarea{resize:vertical;min-height:48px}
+/* Quote number display */
+.qnum-badge{background:rgba(255,255,255,.2);border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:800;letter-spacing:.5px;margin-left:auto}
 .excl-row{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);background:#fafafa}
 .excl-lbl{font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;flex:1}
 .toggle{position:relative;display:inline-block;width:44px;height:22px;flex-shrink:0}
@@ -73,7 +76,7 @@ input:checked+.slider:before{transform:translateX(22px)}
 .propina-row{display:flex;align-items:center;gap:8px;padding:7px 16px 6px;border-bottom:1px solid var(--border);background:#fffdf5;display:none}
 .propina-row label{font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;flex:1;cursor:pointer}
 .propina-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--br)}
-.qlist{max-height:240px;overflow:auto;padding:8px 16px}
+.qlist{max-height:220px;overflow:auto;padding:8px 16px}
 .qitem{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f2f2f2}
 .qiinfo{flex:1;min-width:0}
 .qiname{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -104,7 +107,7 @@ input:checked+.slider:before{transform:translateX(22px)}
 #toast.show{opacity:1;transform:translateY(0)}
 #toast.ok{background:#27ae60}
 #toast.err{background:#e74c3c}
-@media(max-width:600px){.filters-bar{padding:10px 12px;gap:8px}.filter-group{max-width:100%}.search-wrap{max-width:100%}}
+@media(max-width:600px){.filters-bar{padding:10px 12px;gap:8px}.filter-group{max-width:100%}.search-wrap{max-width:100%}.cform-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -115,7 +118,6 @@ input:checked+.slider:before{transform:translateX(22px)}
   </div>
 </header>
 
-<!-- Filters bar -->
 <div class="filters-bar">
   <div class="filter-group">
     <label>Marca</label>
@@ -158,16 +160,44 @@ input:checked+.slider:before{transform:translateX(22px)}
       <div class="ch">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <h2>Cotizaci&#243;n</h2>
+        <span class="qnum-badge" id="qnumBadge">Sin n&#250;mero</span>
         <span class="badge" id="qcount">0</span>
       </div>
-      <div class="cs">
-        <label for="cname">Nombre del cliente</label>
-        <input type="text" id="cname" placeholder="Ej: Restaurante El Sabor"/>
+
+      <!-- Client data form -->
+      <div class="cform">
+        <h3>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Datos del Cliente
+        </h3>
+        <div class="cform-grid">
+          <div class="cf full">
+            <label>Nombre o Raz&#243;n Social</label>
+            <input type="text" id="cNombre" placeholder="Ej: Empresa XYZ S.A.S." autocomplete="off"/>
+          </div>
+          <div class="cf">
+            <label>NIT o C&#233;dula</label>
+            <input type="text" id="cNit" placeholder="900.123.456-7" autocomplete="off"/>
+          </div>
+          <div class="cf">
+            <label>Nombre del Contacto</label>
+            <input type="text" id="cContacto" placeholder="Nombre completo" autocomplete="off"/>
+          </div>
+          <div class="cf">
+            <label>Tel&#233;fono</label>
+            <input type="tel" id="cTel" placeholder="+57 300 000 0000" autocomplete="off"/>
+          </div>
+          <div class="cf">
+            <label>Correo Electr&#243;nico</label>
+            <input type="email" id="cEmail" placeholder="correo@empresa.com" autocomplete="off"/>
+          </div>
+          <div class="cf full">
+            <label>Observaciones Generales</label>
+            <textarea id="obsField" placeholder="Ej: Requiere montaje especial, ingreso temprano..."></textarea>
+          </div>
+        </div>
       </div>
-      <div class="cs" style="border-bottom:1px solid var(--border)">
-        <label for="obsField">Observaciones</label>
-        <textarea id="obsField" placeholder="Ej: Requiere montaje especial, ingreso temprano..."></textarea>
-      </div>
+
       <div class="excl-row">
         <span class="excl-lbl">&#127976; Exclusividad del Espacio</span>
         <label class="toggle"><input type="checkbox" id="exclToggle"/><span class="slider"></span></label>
@@ -208,33 +238,470 @@ input:checked+.slider:before{transform:translateX(22px)}
 <script>
 let allProducts=[],quote=[],activeCat='';
 const fmt=n=>'$'+Math.round(n).toLocaleString('es-CO');
-const BRAND_CONFIG={'TARIFA MALANGA':{name:'Malanga',col:[44,110,73],col2:[27,67,50]},'TARIFA ROCOTO':{name:'Rocoto',col:[139,0,20],col2:[100,0,15]},'TARIFA HOTWINGS':{name:'Foodwins / Hotwings',col:[192,57,43],col2:[146,43,33]}};
-function setBrand(key){const cfg=BRAND_CONFIG[key];if(!cfg)return;const r=document.documentElement;const [r1,g1,b1]=cfg.col;const [r2,g2,b2]=cfg.col2;r.style.setProperty('--br','rgb('+r1+','+g1+','+b1+')');r.style.setProperty('--br2','rgb('+r2+','+g2+','+b2+')');document.getElementById('htitle').textContent='Cotizaciones '+cfg.name;}
-async function loadProducts(brand){const pc=document.getElementById('pcont');pc.innerHTML='<div class="msg"><span class="spin"><\/span><br/>Cargando productos...<\/div>';document.getElementById('pcount').textContent='0 art\u00edculos';allProducts=[];activeCat='';try{const r=await fetch('/api/data?brand='+encodeURIComponent(brand));const j=await r.json();if(!j.ok)throw new Error(j.error||'API error');allProducts=j.rows.map((row,i)=>({id:i,familia:(row.familia||'OTROS').toUpperCase().trim(),nombre:(row.articulo||'').trim(),precio:parseFloat(row.precio)||0}));buildCatDropdown();renderProducts();document.getElementById('hsub').textContent=allProducts.length+' productos disponibles';}catch(e){pc.innerHTML='<div class="msg" style="color:#e74c3c">Error al cargar: '+e.message+'<\/div>';}}
-function buildCatDropdown(){const fams=[...new Set(allProducts.map(p=>p.familia).filter(Boolean))].sort();const sel=document.getElementById('catSel');sel.innerHTML='<option value="">Todas las categor\u00edas<\/option>'+fams.map(f=>'<option value="'+f+'">'+f+'<\/option>').join('');sel.value=activeCat;}
-function renderProducts(){const search=(document.getElementById('search').value||'').toLowerCase().trim();let list=allProducts;if(activeCat)list=list.filter(p=>p.familia===activeCat);if(search)list=list.filter(p=>p.nombre.toLowerCase().includes(search));document.getElementById('pcount').textContent=list.length+' art\u00edculos';if(!list.length){document.getElementById('pcont').innerHTML='<div class="msg">No se encontraron productos.<\/div>';return;}const rows=list.map(p=>'<tr><td><div class="pn">'+p.nombre+'<\/div><span class="pfam">'+p.familia+'<\/span><\/td><td class="ppr">'+fmt(p.precio)+'<\/td><td><div class="qc"><input class="qi" type="number" min="1" value="1" id="qi_'+p.id+'"><button class="ba" data-id="'+p.id+'">+ Agregar<\/button><\/div><\/td><\/tr>').join('');document.getElementById('pcont').innerHTML='<div class="ptw"><table class="pt"><thead><tr><th>Producto<\/th><th>Precio<\/th><th>Cant.<\/th><\/tr><\/thead><tbody>'+rows+'<\/tbody><\/table><\/div>';document.getElementById('pcont').querySelectorAll('.ba').forEach(btn=>{btn.addEventListener('click',()=>{const id=parseInt(btn.dataset.id);const qty=parseInt(document.getElementById('qi_'+id).value)||1;addToQuote(id,qty);});});}
-function addToQuote(id,qty){const prod=allProducts.find(p=>p.id===id);if(!prod)return;const ex=quote.find(q=>q.id===id);if(ex){ex.qty+=qty;}else{quote.push(Object.assign({},prod,{qty}));}renderQuote();toast(prod.nombre+' agregado (\u00d7'+qty+')','ok');}
-function renderQuote(){const el=document.getElementById('qlist');document.getElementById('qcount').textContent=quote.reduce((s,q)=>s+q.qty,0);if(!quote.length){el.innerHTML='<div class="empty">A\u00fan no hay productos en la cotizaci\u00f3n.<\/div>';document.getElementById('bpdf').disabled=true;updateTotals();return;}document.getElementById('bpdf').disabled=false;el.innerHTML=quote.map((q,i)=>'<div class="qitem"><div class="qiinfo"><div class="qiname">'+q.nombre+'<\/div><div class="qimeta">'+q.familia+' &bull; '+q.qty+' &times; '+fmt(q.precio)+'<\/div><\/div><div class="qisub">'+fmt(q.qty*q.precio)+'<\/div><button class="brm" data-i="'+i+'" title="Quitar">&times;<\/button><\/div>').join('');el.querySelectorAll('.brm').forEach(b=>{b.addEventListener('click',()=>{quote.splice(parseInt(b.dataset.i),1);renderQuote();});});updateTotals();}
-function updateTotals(){const exclOn=document.getElementById('exclToggle').checked;const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;const byFam={};quote.forEach(q=>{const k=q.familia||'OTROS';byFam[k]=(byFam[k]||0)+(q.qty*q.precio);});const catEl=document.getElementById('catTots');let rows=Object.entries(byFam).map(([k,v])=>'<div class="trow"><span class="lbl">'+k+'<\/span><span class="val">'+fmt(v)+'<\/span><\/div>').join('');if(exclOn&&exclAmt>0)rows+='<div class="trow excl-line"><span class="lbl">&#127976; Exclusividad<\/span><span class="val">'+fmt(exclAmt)+'<\/span><\/div>';catEl.innerHTML=rows;const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);const subtotal=productSub+exclAmt;const impo=Math.round(subtotal*0.08);const totalSinProp=subtotal+impo;const propina=Math.round(subtotal*0.10);const totalConProp=totalSinProp+propina;const hasItems=quote.length>0;const propCheck=document.getElementById('propCheck');const inclProp=propCheck?propCheck.checked:false;const propinaRow=document.getElementById('propinaRow');if(propinaRow)propinaRow.style.display=hasItems?'flex':'none';const set=(id,val,show)=>{const el=document.getElementById(id);if(el){el.textContent=fmt(val);el.parentElement.style.display=show?'flex':'none';}}; set('valSubtotal',subtotal,hasItems);set('valImpo',impo,hasItems);set('valSinProp',totalSinProp,hasItems);set('valProp',propina,hasItems&&inclProp);document.getElementById('rowProp').style.display=(hasItems&&inclProp)?'flex':'none';document.getElementById('rowTotalProp').style.display=(hasItems&&inclProp)?'flex':'none';document.getElementById('rowTotal').style.display=(hasItems&&!inclProp)?'flex':'none';if(hasItems&&inclProp){document.getElementById('ttotalProp').textContent=fmt(totalConProp);document.getElementById('ttotal').textContent=fmt(totalConProp);}else{document.getElementById('ttotal').textContent=fmt(totalSinProp||subtotal);if(!hasItems)document.getElementById('ttotal').textContent='$0';}}
-function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+(type==='ok'?'ok':'err');setTimeout(()=>t.className='',2400);}
-function generatePDF(){const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});const bSel=document.getElementById('brandSel');const bName=bSel.options[bSel.selectedIndex].text;const cName=document.getElementById('cname').value||'Cliente';const obs=document.getElementById('obsField').value||'';const exclOn=document.getElementById('exclToggle').checked;const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;const propCheck=document.getElementById('propCheck');const inclProp=propCheck?propCheck.checked:false;const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});const cfg=BRAND_CONFIG[bSel.value]||BRAND_CONFIG['TARIFA MALANGA'];const col=cfg.col;const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);const subtotal=productSub+exclAmt;const impo=Math.round(subtotal*0.08);const totalSinProp=subtotal+impo;const propina=Math.round(subtotal*0.10);const totalConProp=totalSinProp+propina;const displayTotal=inclProp?totalConProp:totalSinProp;
-doc.setFillColor(...col);doc.rect(0,0,210,28,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('COTIZACI\u00d3N - '+bName.toUpperCase(),14,17);doc.setFontSize(9);doc.setFont(undefined,'normal');doc.text(fecha,196,17,{align:'right'});doc.setTextColor(50,50,50);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.text('Cliente:',14,36);doc.setFont(undefined,'normal');doc.text(cName,36,36);doc.setFont(undefined,'bold');doc.text('Total:',14,42);doc.setFont(undefined,'normal');doc.text(fmt(displayTotal),36,42);
-const body=quote.map(q=>[q.nombre,q.qty,fmt(q.precio),fmt(q.qty*q.precio)]);if(exclOn&&exclAmt>0)body.push(['Exclusividad del Espacio',1,fmt(exclAmt),fmt(exclAmt)]);
-doc.autoTable({startY:48,head:[['Producto','Cant.','Precio Unit.','Subtotal']],body,headStyles:{fillColor:col,textColor:[255,255,255],fontStyle:'bold',fontSize:9},bodyStyles:{fontSize:9},alternateRowStyles:{fillColor:[248,248,248]},columnStyles:{1:{cellWidth:16,halign:'center'},2:{cellWidth:32,halign:'right'},3:{cellWidth:32,halign:'right'}},margin:{left:14,right:14}});
-let y=doc.lastAutoTable.finalY+6;const boxX=110,boxW=86,lineH=7;const totLines=[{label:'Subtotal',val:fmt(subtotal),bold:false},{label:'Impoconsumo (8%)',val:fmt(impo),bold:false},{label:'Total sin propina',val:fmt(totalSinProp),bold:true}];if(inclProp){totLines.push({label:'Propina sugerida (10%)',val:fmt(propina),bold:false,orange:true});totLines.push({label:'TOTAL CON PROPINA',val:fmt(totalConProp),bold:true,highlight:true});}else{totLines.push({label:'TOTAL',val:fmt(totalSinProp),bold:true,highlight:true});}
-const boxH=totLines.length*lineH+6;doc.setFillColor(248,248,248);doc.rect(boxX,y,boxW,boxH,'F');doc.setDrawColor(...col);doc.setLineWidth(0.5);doc.rect(boxX,y,boxW,boxH);let ty=y+5;totLines.forEach(line=>{if(line.highlight){doc.setFillColor(...col);doc.rect(boxX,ty-4,boxW,lineH+1,'F');doc.setTextColor(255,255,255);}else if(line.orange){doc.setTextColor(230,126,34);}else{doc.setTextColor(50,50,50);}doc.setFontSize(line.highlight?9.5:8);doc.setFont(undefined,line.bold?'bold':'normal');doc.text(line.label,boxX+3,ty);doc.text(line.val,boxX+boxW-3,ty,{align:'right'});ty+=lineH;});doc.setTextColor(50,50,50);y+=boxH+8;
-if(obs){doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text('Observaciones:',14,y);doc.setFont(undefined,'normal');const obsL=doc.splitTextToSize(obs,182);doc.text(obsL,14,y+5);y+=5+obsL.length*4;}
-if(exclOn&&exclAmt>0){y+=4;const lc=col.map(c=>Math.min(c+180,255));doc.setFillColor(...lc);doc.rect(14,y-3,182,10,'F');doc.setTextColor(...col);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text('\u2605 EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt),14,y+4);}
-doc.setFontSize(7);doc.setTextColor(150,150,150);doc.setFont(undefined,'normal');doc.text('Documento generado autom\u00e1ticamente | '+bName+' \u2022 '+new Date().toLocaleString('es-CO'),105,290,{align:'center'});const safe=cName.replace(/[^a-z0-9]/gi,'_');doc.save('Cotizacion_'+bName+'_'+safe+'.pdf');toast('PDF generado con \u00e9xito','ok');}
-document.getElementById('brandSel').addEventListener('change',e=>{const val=e.target.value;if(!val)return;setBrand(val);document.getElementById('hsub').textContent='Cargando cat\u00e1logo...';document.getElementById('catSel').innerHTML='<option value="">Todas las categor\u00edas<\/option>';document.getElementById('search').value='';activeCat='';loadProducts(val);});
+
+// Brand configuration with logo URLs (hosted on GitHub or as data URLs)
+const BRAND_CONFIG={
+  'TARIFA MALANGA':{
+    name:'Malanga',
+    shortCode:'MAL',
+    col:[44,110,73],col2:[27,67,50],
+    logoKey:'logo_malanga',
+    razonSocial:'Malanga Restaurante',
+    nit:'',
+    direccion:'',
+    tel:'',
+    email:''
+  },
+  'TARIFA ROCOTO':{
+    name:'Rocoto',
+    shortCode:'ROC',
+    col:[139,0,20],col2:[100,0,15],
+    logoKey:'logo_rocoto',
+    razonSocial:'Rocoto Cocina Peruana',
+    nit:'',
+    direccion:'',
+    tel:'',
+    email:''
+  },
+  'TARIFA HOTWINGS':{
+    name:'Foodwins / Hotwings',
+    shortCode:'FOO',
+    col:[192,57,43],col2:[146,43,33],
+    logoKey:'logo_hotwings',
+    razonSocial:'Foodwins / Hot Wings',
+    nit:'',
+    direccion:'',
+    tel:'',
+    email:''
+  }
+};
+
+// Logo store - images embedded as base64 (set at runtime from user-uploaded logos)
+const LOGOS={};
+
+function setBrand(key){
+  const cfg=BRAND_CONFIG[key];
+  if(!cfg)return;
+  const [r1,g1,b1]=cfg.col;
+  const [r2,g2,b2]=cfg.col2;
+  const r=document.documentElement;
+  r.style.setProperty('--br','rgb('+r1+','+g1+','+b1+')');
+  r.style.setProperty('--br2','rgb('+r2+','+g2+','+b2+')');
+  document.getElementById('htitle').textContent='Cotizaciones '+cfg.name;
+  updateQuoteNumberBadge(key);
+}
+
+// Quote numbering - stored in localStorage per brand
+function getNextQuoteNumber(brandKey){
+  const cfg=BRAND_CONFIG[brandKey];
+  if(!cfg)return'COT-00001';
+  const storKey='qnum_'+cfg.shortCode;
+  let n=parseInt(localStorage.getItem(storKey)||'0')+1;
+  localStorage.setItem(storKey,n);
+  return cfg.shortCode+'-'+String(n).padStart(5,'0');
+}
+
+function peekQuoteNumber(brandKey){
+  const cfg=BRAND_CONFIG[brandKey];
+  if(!cfg)return'---';
+  const storKey='qnum_'+cfg.shortCode;
+  let n=parseInt(localStorage.getItem(storKey)||'0')+1;
+  return cfg.shortCode+'-'+String(n).padStart(5,'0');
+}
+
+let currentQuoteNum='';
+function updateQuoteNumberBadge(brandKey){
+  if(!brandKey){document.getElementById('qnumBadge').textContent='Sin número';return;}
+  const next=peekQuoteNumber(brandKey);
+  document.getElementById('qnumBadge').textContent='Nº '+next;
+}
+
+async function loadProducts(brand){
+  const pc=document.getElementById('pcont');
+  pc.innerHTML='<div class="msg"><span class="spin"><\/span><br/>Cargando productos...<\/div>';
+  document.getElementById('pcount').textContent='0 artículos';
+  allProducts=[];activeCat='';
+  try{
+    const r=await fetch('/api/data?brand='+encodeURIComponent(brand));
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error||'API error');
+    allProducts=j.rows.map((row,i)=>({
+      id:i,
+      familia:(row.familia||'OTROS').toUpperCase().trim(),
+      nombre:(row.articulo||'').trim(),
+      precio:parseFloat(row.precio)||0
+    }));
+    buildCatDropdown();
+    renderProducts();
+    document.getElementById('hsub').textContent=allProducts.length+' productos disponibles';
+  }catch(e){
+    pc.innerHTML='<div class="msg" style="color:#e74c3c">Error al cargar: '+e.message+'<\/div>';
+  }
+}
+
+function buildCatDropdown(){
+  const fams=[...new Set(allProducts.map(p=>p.familia).filter(Boolean))].sort();
+  const sel=document.getElementById('catSel');
+  sel.innerHTML='<option value="">Todas las categorías<\/option>'+fams.map(f=>'<option value="'+f+'">'+f+'<\/option>').join('');
+  sel.value=activeCat;
+}
+
+function renderProducts(){
+  const search=(document.getElementById('search').value||'').toLowerCase().trim();
+  let list=allProducts;
+  if(activeCat)list=list.filter(p=>p.familia===activeCat);
+  if(search)list=list.filter(p=>p.nombre.toLowerCase().includes(search));
+  document.getElementById('pcount').textContent=list.length+' artículos';
+  if(!list.length){document.getElementById('pcont').innerHTML='<div class="msg">No se encontraron productos.<\/div>';return;}
+  const rows=list.map(p=>'<tr><td><div class="pn">'+p.nombre+'<\/div><span class="pfam">'+p.familia+'<\/span><\/td><td class="ppr">'+fmt(p.precio)+'<\/td><td><div class="qc"><input class="qi" type="number" min="1" value="1" id="qi_'+p.id+'"><button class="ba" data-id="'+p.id+'">+ Agregar<\/button><\/div><\/td><\/tr>').join('');
+  document.getElementById('pcont').innerHTML='<div class="ptw"><table class="pt"><thead><tr><th>Producto<\/th><th>Precio<\/th><th>Cant.<\/th><\/tr><\/thead><tbody>'+rows+'<\/tbody><\/table><\/div>';
+  document.getElementById('pcont').querySelectorAll('.ba').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=parseInt(btn.dataset.id);
+      const qty=parseInt(document.getElementById('qi_'+id).value)||1;
+      addToQuote(id,qty);
+    });
+  });
+}
+function addToQuote(id,qty){
+  const prod=allProducts.find(p=>p.id===id);
+  if(!prod)return;
+  const ex=quote.find(q=>q.id===id);
+  if(ex){ex.qty+=qty;}else{quote.push(Object.assign({},prod,{qty}));}
+  renderQuote();
+  toast(prod.nombre+' agregado (×'+qty+')','ok');
+}
+
+function renderQuote(){
+  const el=document.getElementById('qlist');
+  document.getElementById('qcount').textContent=quote.reduce((s,q)=>s+q.qty,0);
+  if(!quote.length){
+    el.innerHTML='<div class="empty">Aún no hay productos en la cotización.<\/div>';
+    document.getElementById('bpdf').disabled=true;
+    updateTotals();return;
+  }
+  document.getElementById('bpdf').disabled=false;
+  el.innerHTML=quote.map((q,i)=>'<div class="qitem"><div class="qiinfo"><div class="qiname">'+q.nombre+'<\/div><div class="qimeta">'+q.familia+' &bull; '+q.qty+' &times; '+fmt(q.precio)+'<\/div><\/div><div class="qisub">'+fmt(q.qty*q.precio)+'<\/div><button class="brm" data-i="'+i+'" title="Quitar">&times;<\/button><\/div>').join('');
+  el.querySelectorAll('.brm').forEach(b=>{
+    b.addEventListener('click',()=>{quote.splice(parseInt(b.dataset.i),1);renderQuote();});
+  });
+  updateTotals();
+}
+
+function updateTotals(){
+  const exclOn=document.getElementById('exclToggle').checked;
+  const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;
+  const byFam={};
+  quote.forEach(q=>{const k=q.familia||'OTROS';byFam[k]=(byFam[k]||0)+(q.qty*q.precio);});
+  const catEl=document.getElementById('catTots');
+  let rows=Object.entries(byFam).map(([k,v])=>'<div class="trow"><span class="lbl">'+k+'<\/span><span class="val">'+fmt(v)+'<\/span><\/div>').join('');
+  if(exclOn&&exclAmt>0)rows+='<div class="trow excl-line"><span class="lbl">&#127976; Exclusividad<\/span><span class="val">'+fmt(exclAmt)+'<\/span><\/div>';
+  catEl.innerHTML=rows;
+  const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
+  const subtotal=productSub+exclAmt;
+  const impo=Math.round(subtotal*0.08);
+  const totalSinProp=subtotal+impo;
+  const propina=Math.round(subtotal*0.10);
+  const totalConProp=totalSinProp+propina;
+  const hasItems=quote.length>0;
+  const propCheck=document.getElementById('propCheck');
+  const inclProp=propCheck?propCheck.checked:false;
+  const propinaRow=document.getElementById('propinaRow');
+  if(propinaRow)propinaRow.style.display=hasItems?'flex':'none';
+  const set=(id,val,show)=>{const el=document.getElementById(id);if(el){el.textContent=fmt(val);el.parentElement.style.display=show?'flex':'none';}};
+  set('valSubtotal',subtotal,hasItems);
+  set('valImpo',impo,hasItems);
+  set('valSinProp',totalSinProp,hasItems);
+  set('valProp',propina,hasItems&&inclProp);
+  document.getElementById('rowProp').style.display=(hasItems&&inclProp)?'flex':'none';
+  document.getElementById('rowTotalProp').style.display=(hasItems&&inclProp)?'flex':'none';
+  document.getElementById('rowTotal').style.display=(hasItems&&!inclProp)?'flex':'none';
+  if(hasItems&&inclProp){
+    document.getElementById('ttotalProp').textContent=fmt(totalConProp);
+    document.getElementById('ttotal').textContent=fmt(totalConProp);
+  }else{
+    document.getElementById('ttotal').textContent=fmt(totalSinProp||subtotal);
+    if(!hasItems)document.getElementById('ttotal').textContent='$0';
+  }
+}
+
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='show '+(type==='ok'?'ok':'err');
+  setTimeout(()=>t.className='',2400);
+}
+// Convert image URL to base64 for PDF embedding
+function imgToBase64(url){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){
+      const c=document.createElement('canvas');
+      c.width=img.width;c.height=img.height;
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0);
+      resolve(c.toDataURL('image/png'));
+    };
+    img.onerror=()=>resolve(null);
+    img.src=url;
+  });
+}
+
+async function generatePDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const bSel=document.getElementById('brandSel');
+  const brandKey=bSel.value;
+  const cfg=BRAND_CONFIG[brandKey]||BRAND_CONFIG['TARIFA MALANGA'];
+  const col=cfg.col;
+  const col2=cfg.col2;
+
+  // Get client data
+  const cNombre=(document.getElementById('cNombre').value||'').trim()||'Sin especificar';
+  const cNit=(document.getElementById('cNit').value||'').trim();
+  const cContacto=(document.getElementById('cContacto').value||'').trim();
+  const cTel=(document.getElementById('cTel').value||'').trim();
+  const cEmail=(document.getElementById('cEmail').value||'').trim();
+  const obs=(document.getElementById('obsField').value||'').trim();
+
+  // Exclusivity
+  const exclOn=document.getElementById('exclToggle').checked;
+  const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;
+
+  // Propina
+  const propCheck=document.getElementById('propCheck');
+  const inclProp=propCheck?propCheck.checked:false;
+
+  // Generate quote number (increments counter)
+  const quoteNum=getNextQuoteNumber(brandKey);
+  currentQuoteNum=quoteNum;
+  updateQuoteNumberBadge(brandKey);
+
+  // Date
+  const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+
+  // Calculations
+  const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
+  const subtotal=productSub+exclAmt;
+  const impo=Math.round(subtotal*0.08);
+  const totalSinProp=subtotal+impo;
+  const propina=Math.round(subtotal*0.10);
+  const totalConProp=totalSinProp+propina;
+  const displayTotal=inclProp?totalConProp:totalSinProp;
+
+  // === HEADER BAND ===
+  doc.setFillColor(...col);
+  doc.rect(0,0,210,36,'F');
+
+  // Try to load logo
+  const logoUrl='/logos/'+cfg.logoKey+'.png';
+  let logoB64=null;
+  try{logoB64=await imgToBase64(logoUrl);}catch(e){}
+
+  let textStartX=14;
+  if(logoB64){
+    try{
+      doc.addImage(logoB64,'PNG',12,4,28,28);
+      textStartX=44;
+    }catch(e){}
+  }
+
+  // Brand name
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(18);
+  doc.setFont(undefined,'bold');
+  doc.text(cfg.name.toUpperCase(),textStartX,15);
+
+  // Quote number and date on header
+  doc.setFontSize(9);
+  doc.setFont(undefined,'normal');
+  doc.text('Cotización Nº '+quoteNum,textStartX,22);
+  doc.text(fecha,196,22,{align:'right'});
+  doc.setFontSize(8);
+  doc.text('Fecha: '+fecha,196,9,{align:'right'});
+
+  // === CLIENT INFO BOX ===
+  let y=42;
+  doc.setFillColor(245,245,250);
+  doc.rect(12,y,186,32,'F');
+  doc.setDrawColor(...col);
+  doc.setLineWidth(0.4);
+  doc.rect(12,y,186,32);
+
+  // Left column label bar
+  doc.setFillColor(...col);
+  doc.rect(12,y,42,7,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(7.5);
+  doc.setFont(undefined,'bold');
+  doc.text('DATOS DEL CLIENTE',14,y+5);
+
+  y+=9;
+  doc.setTextColor(60,60,60);
+  doc.setFont(undefined,'bold');
+  doc.setFontSize(8);
+  doc.text('Razón Social:',14,y);
+  doc.setFont(undefined,'normal');
+  doc.text(cNombre,52,y);
+
+  y+=6;
+  doc.setFont(undefined,'bold');
+  doc.text('NIT / Cédula:',14,y);
+  doc.setFont(undefined,'normal');
+  doc.text(cNit||'---',52,y);
+
+  doc.setFont(undefined,'bold');
+  doc.text('Contacto:',110,y);
+  doc.setFont(undefined,'normal');
+  doc.text(cContacto||'---',132,y);
+
+  y+=6;
+  doc.setFont(undefined,'bold');
+  doc.text('Teléfono:',14,y);
+  doc.setFont(undefined,'normal');
+  doc.text(cTel||'---',52,y);
+
+  doc.setFont(undefined,'bold');
+  doc.text('Email:',110,y);
+  doc.setFont(undefined,'normal');
+  const emailText=cEmail||'---';
+  doc.text(emailText.length>30?emailText.substring(0,30)+'...':emailText,132,y);
+
+  y+=10;
+
+  // === PRODUCTS TABLE ===
+  const body=quote.map(q=>[q.nombre,q.qty,fmt(q.precio),fmt(q.qty*q.precio)]);
+  if(exclOn&&exclAmt>0)body.push(['Exclusividad del Espacio',1,fmt(exclAmt),fmt(exclAmt)]);
+
+  doc.autoTable({
+    startY:y,
+    head:[['Producto','Cant.','Precio Unit.','Subtotal']],
+    body,
+    headStyles:{fillColor:col,textColor:[255,255,255],fontStyle:'bold',fontSize:9},
+    bodyStyles:{fontSize:9},
+    alternateRowStyles:{fillColor:[248,248,248]},
+    columnStyles:{1:{cellWidth:16,halign:'center'},2:{cellWidth:32,halign:'right'},3:{cellWidth:32,halign:'right'}},
+    margin:{left:12,right:12}
+  });
+
+  // === TOTALS BOX ===
+  y=doc.lastAutoTable.finalY+6;
+  const boxX=112,boxW=86,lineH=7;
+  const totLines=[
+    {label:'Subtotal',val:fmt(subtotal),bold:false},
+    {label:'Impoconsumo (8%)',val:fmt(impo),bold:false},
+    {label:'Total sin propina',val:fmt(totalSinProp),bold:true}
+  ];
+  if(inclProp){
+    totLines.push({label:'Propina sugerida (10%)',val:fmt(propina),bold:false,orange:true});
+    totLines.push({label:'TOTAL CON PROPINA',val:fmt(totalConProp),bold:true,highlight:true});
+  }else{
+    totLines.push({label:'TOTAL',val:fmt(totalSinProp),bold:true,highlight:true});
+  }
+  const boxH=totLines.length*lineH+6;
+  doc.setFillColor(248,248,248);
+  doc.rect(boxX,y,boxW,boxH,'F');
+  doc.setDrawColor(...col);
+  doc.setLineWidth(0.5);
+  doc.rect(boxX,y,boxW,boxH);
+  let ty=y+5;
+  totLines.forEach(line=>{
+    if(line.highlight){
+      doc.setFillColor(...col);
+      doc.rect(boxX,ty-4,boxW,lineH+1,'F');
+      doc.setTextColor(255,255,255);
+    }else if(line.orange){
+      doc.setTextColor(230,126,34);
+    }else{
+      doc.setTextColor(50,50,50);
+    }
+    doc.setFontSize(line.highlight?9.5:8);
+    doc.setFont(undefined,line.bold?'bold':'normal');
+    doc.text(line.label,boxX+3,ty);
+    doc.text(line.val,boxX+boxW-3,ty,{align:'right'});
+    ty+=lineH;
+  });
+  doc.setTextColor(50,50,50);
+  y+=boxH+8;
+
+  // === OBSERVATIONS ===
+  if(obs){
+    if(y>240){doc.addPage();y=20;}
+    doc.setFontSize(9);doc.setFont(undefined,'bold');
+    doc.text('Observaciones:',12,y);
+    doc.setFont(undefined,'normal');
+    const obsL=doc.splitTextToSize(obs,180);
+    doc.text(obsL,12,y+5);
+    y+=5+obsL.length*4;
+  }
+
+  // === EXCLUSIVITY NOTE ===
+  if(exclOn&&exclAmt>0){
+    y+=4;
+    const lc=col.map(c=>Math.min(c+180,255));
+    doc.setFillColor(...lc);
+    doc.rect(12,y-3,186,10,'F');
+    doc.setTextColor(...col);
+    doc.setFontSize(9);doc.setFont(undefined,'bold');
+    doc.text('★ EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt),14,y+4);
+  }
+
+  // === FOOTER ===
+  doc.setFontSize(7);
+  doc.setTextColor(150,150,150);
+  doc.setFont(undefined,'normal');
+  doc.text('Cotización '+quoteNum+' | '+cfg.name+' | '+fecha,105,288,{align:'center'});
+
+  // === SAVE with smart filename ===
+  const safeCliente=cNombre.replace(/[^a-z0-9áéíóúñàèìòù ]/gi,'').trim().replace(/s+/g,'_').substring(0,30);
+  const filename='COT-'+quoteNum+'-'+safeCliente+'.pdf';
+  doc.save(filename);
+  toast('PDF '+quoteNum+' generado con éxito','ok');
+}
+// Event listeners
+document.getElementById('brandSel').addEventListener('change',e=>{
+  const val=e.target.value;
+  if(!val)return;
+  setBrand(val);
+  document.getElementById('hsub').textContent='Cargando catálogo...';
+  document.getElementById('catSel').innerHTML='<option value="">Todas las categorías<\/option>';
+  document.getElementById('search').value='';
+  activeCat='';
+  loadProducts(val);
+});
 document.getElementById('catSel').addEventListener('change',e=>{activeCat=e.target.value;renderProducts();});
 document.getElementById('search').addEventListener('input',renderProducts);
-document.getElementById('exclToggle').addEventListener('change',function(){document.getElementById('exclLabel').textContent=this.checked?'S\u00ed':'No';document.getElementById('exclValBox').classList.toggle('show',this.checked);updateTotals();});
+document.getElementById('exclToggle').addEventListener('change',function(){
+  document.getElementById('exclLabel').textContent=this.checked?'Sí':'No';
+  document.getElementById('exclValBox').classList.toggle('show',this.checked);
+  updateTotals();
+});
 document.getElementById('exclVal').addEventListener('input',updateTotals);
 document.getElementById('propCheck').addEventListener('change',updateTotals);
 document.getElementById('bpdf').addEventListener('click',generatePDF);
-document.getElementById('bnew').addEventListener('click',()=>{quote=[];document.getElementById('cname').value='';document.getElementById('obsField').value='';document.getElementById('exclToggle').checked=false;document.getElementById('exclLabel').textContent='No';document.getElementById('exclValBox').classList.remove('show');document.getElementById('exclVal').value='';document.getElementById('propCheck').checked=true;renderQuote();toast('Nueva cotizaci\u00f3n iniciada','ok');});
-document.getElementById('bclr').addEventListener('click',()=>{if(!quote.length)return;quote=[];renderQuote();toast('Cotizaci\u00f3n limpiada','ok');});
+document.getElementById('bnew').addEventListener('click',()=>{
+  quote=[];
+  document.getElementById('cNombre').value='';
+  document.getElementById('cNit').value='';
+  document.getElementById('cContacto').value='';
+  document.getElementById('cTel').value='';
+  document.getElementById('cEmail').value='';
+  document.getElementById('obsField').value='';
+  document.getElementById('exclToggle').checked=false;
+  document.getElementById('exclLabel').textContent='No';
+  document.getElementById('exclValBox').classList.remove('show');
+  document.getElementById('exclVal').value='';
+  document.getElementById('propCheck').checked=true;
+  renderQuote();
+  toast('Nueva cotización iniciada','ok');
+});
+document.getElementById('bclr').addEventListener('click',()=>{
+  if(!quote.length)return;
+  quote=[];
+  renderQuote();
+  toast('Cotización limpiada','ok');
+});
 </script>
 </body>
 </html>
