@@ -103,6 +103,9 @@ input:checked+.slider:before{transform:translateX(22px)}
 .bpdf{width:100%;padding:12px;border-radius:8px;border:none;background:var(--header-bg);color:#fff;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.3px}
 .bpdf:hover{opacity:.9}
 .bpdf:disabled{opacity:.35;cursor:not-allowed}
+.bsave{width:100%;padding:11px;border-radius:8px;border:2px solid var(--header-bg);background:transparent;color:var(--header-bg);font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.3px}
+.bsave:hover{background:var(--header-bg);color:#fff}
+.bsave:disabled{opacity:.45;cursor:not-allowed}
 .btn-row{display:flex;gap:7px}
 .bnew{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--br);background:transparent;color:var(--br);font-size:.8rem;font-weight:600;cursor:pointer}
 .bnew:hover{background:var(--bg-warm)}
@@ -266,6 +269,9 @@ input:checked+.slider:before{transform:translateX(22px)}
         <div class="ttotal" id="rowTotal" style="display:none"><span>Total General</span><span id="ttotal">$0</span></div>
       </div>
       <div class="qacts">
+        <button class="bsave" id="bsave" disabled>
+          &#128190; Guardar Cotizaci&#243;n
+        </button>
         <button class="bpdf" id="bpdf" disabled>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Generar PDF
@@ -407,6 +413,8 @@ function peekQuoteNumber(brandKey){
 }
 
 let currentQuoteNum='';
+let currentQuoteId='';
+let quoteSaved=false;
 function updateQuoteNumberBadge(brandKey){
   if(!brandKey){document.getElementById('qnumBadge').textContent='Sin número';return;}
   const next=peekQuoteNumber(brandKey);
@@ -474,10 +482,10 @@ function renderQuote(){
   document.getElementById('qcount').textContent=quote.reduce((s,q)=>s+q.qty,0);
   if(!quote.length){
     el.innerHTML='<div class="empty">Aún no hay productos en la cotización.<\/div>';
-    document.getElementById('bpdf').disabled=true;
+    document.getElementById('bpdf').disabled=true;document.getElementById('bsave').disabled=true;
     updateTotals();return;
   }
-  document.getElementById('bpdf').disabled=false;
+  document.getElementById('bpdf').disabled=false;document.getElementById('bsave').disabled=false;
   el.innerHTML=quote.map((q,i)=>'<div class="qitem"><div class="qiinfo"><div class="qiname">'+q.nombre+'<\/div><div class="qimeta">'+q.familia+' &bull; '+q.qty+' &times; '+fmt(q.precio)+'<\/div><\/div><div class="qisub">'+fmt(q.qty*q.precio)+'<\/div><button class="brm" data-i="'+i+'" title="Quitar">&times;<\/button><\/div>').join('');
   el.querySelectorAll('.brm').forEach(b=>{
     b.addEventListener('click',()=>{quote.splice(parseInt(b.dataset.i),1);renderQuote();});
@@ -573,9 +581,15 @@ async function generatePDF(){
   const inclProp=propCheck?propCheck.checked:false;
 
   // Generate quote number
-  const quoteNum=getNextQuoteNumber(brandKey);
-  currentQuoteNum=quoteNum;
-  updateQuoteNumberBadge(brandKey);
+  let quoteNum;
+  if(currentQuoteId){
+    quoteNum=currentQuoteId;
+  } else {
+    quoteNum=getNextQuoteNumber(brandKey);
+    currentQuoteNum=quoteNum;
+    currentQuoteId=quoteNum;
+    updateQuoteNumberBadge(brandKey);
+  }
 
   const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
 
@@ -737,6 +751,7 @@ async function generatePDF(){
   const filename='COT-'+quoteNum+'-'+safeCliente+'.pdf';
   doc.save(filename);
   // Save to Google Sheets
+  if(!quoteSaved){
   saveToSheets({
     id: quoteNum,
     consec: quoteNum,
@@ -755,6 +770,9 @@ async function generatePDF(){
     observaciones: cObs,
     productos: quote.map(q => q.nombre + ' x' + q.qty).join(', ')
   });
+    quoteSaved=true;
+    setTimeout(loadHistory,1500);
+  }
   toast('PDF '+quoteNum+' generado con éxito','ok');
 }
 document.getElementById('brandSel').addEventListener('change',e=>{
@@ -777,8 +795,68 @@ document.getElementById('exclToggle').addEventListener('change',function(){
 document.getElementById('exclVal').addEventListener('input',updateTotals);
 document.getElementById('propCheck').addEventListener('change',updateTotals);
 document.getElementById('bpdf').addEventListener('click',generatePDF);
+// Guardar Cotizacion
+document.getElementById('bsave').addEventListener('click', async () => {
+  if(!brandKey){toast('Selecciona una marca primero.','err');return;}
+  if(!quote.length){toast('Agrega al menos un producto.','err');return;}
+  const cNombre=document.getElementById('cNombre').value.trim();
+  const cNit=document.getElementById('cNit').value.trim();
+  if(!cNombre){toast('Ingresa el nombre del cliente.','err');return;}
+  if(!cNit){toast('Ingresa el NIT o c\u00e9dula.','err');return;}
+  if(quoteSaved){toast('Esta cotizaci\u00f3n ya fue guardada.','ok');return;}
+  const btn=document.getElementById('bsave');
+  btn.disabled=true;
+  if(!currentQuoteId){
+    const qn=getNextQuoteNumber(brandKey);
+    currentQuoteNum=qn;
+    currentQuoteId=qn;
+    updateQuoteNumberBadge(brandKey);
+  }
+  const cfg=BRAND_CONFIG[brandKey];
+  const exclChk=document.getElementById('propCheck');
+  const inclProp=exclChk?exclChk.checked:false;
+  const exclEl=document.getElementById('exclCheck');
+  const inclExcl=exclEl?exclEl.checked:false;
+  const productTotal=quote.reduce((s,q)=>s+q.precio*q.qty,0);
+  const baseSinInc=Math.round(productTotal/1.08);
+  const inc=productTotal-baseSinInc;
+  const exclAmt=inclExcl?300000:0;
+  const propinaBase=baseSinInc;
+  const propina=Math.round(propinaBase*0.10);
+  const totalGeneral=productTotal+exclAmt+(inclProp?propina:0);
+  const cContacto=document.getElementById('cContacto').value.trim();
+  const cTel=document.getElementById('cTel').value.trim();
+  const cEmail=document.getElementById('cEmail').value.trim();
+  const cObs=document.getElementById('cObs')?document.getElementById('cObs').value.trim():'';
+  await saveToSheets({
+    id:currentQuoteId,
+    consec:currentQuoteId,
+    marca:cfg.name,
+    cliente:cNombre,
+    nit:cNit,
+    contacto:cContacto,
+    telefono:cTel,
+    correo:cEmail,
+    subtotal:baseSinInc,
+    inc:inc,
+    exclusividad:exclAmt,
+    basePropina:propinaBase,
+    propina:inclProp?propina:0,
+    total:totalGeneral,
+    observaciones:cObs,
+    productos:quote.map(q=>q.nombre+' x'+q.qty).join(', ')
+  });
+  quoteSaved=true;
+  btn.textContent='\u2713 Guardado';
+  btn.style.background='var(--header-bg)';
+  btn.style.color='#fff';
+  btn.disabled=true;
+  toast('Cotizaci\u00f3n guardada correctamente.','ok');
+  setTimeout(loadHistory,1500);
+});
+
 document.getElementById('bnew').addEventListener('click',()=>{
-  quote=[];
+  quote=[];currentQuoteId='';quoteSaved=false;
   document.getElementById('cNombre').value='';
   document.getElementById('cNit').value='';
   document.getElementById('cContacto').value='';
@@ -795,7 +873,7 @@ document.getElementById('bnew').addEventListener('click',()=>{
 });
 document.getElementById('bclr').addEventListener('click',()=>{
   if(!quote.length)return;
-  quote=[];
+  quote=[];currentQuoteId='';quoteSaved=false;
   renderQuote();
   toast('Cotización limpiada','ok');
 });
