@@ -937,12 +937,9 @@ function duplicateQuote(idx){
 // ---- Save to Sheets after PDF ----
 async function saveToSheets(payload){
   try {
-    await fetch(GAS_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {'Content-Type': 'application/json'}
-    });
-  } catch(e){ /* silent fail — PDF already generated */ }
+    const params = new URLSearchParams({action:'save',data:JSON.stringify(payload)});
+    await fetch(GAS_URL + '?' + params.toString());
+  } catch(e){ /* silent fail */ }
 }
 </script>
 </body>
