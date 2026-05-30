@@ -832,6 +832,7 @@ async function generatePDF(){
 
   // ─────────────────────────────────────────────────────────────
 
+  const safeCliente=(cNombre||'cliente').replace(/[^a-zA-Z0-9]/g,'-').substring(0,30);
   const filename='COT-'+quoteNum+'-'+safeCliente+'.pdf';
   doc.save(filename);
   // Save to Google Sheets
