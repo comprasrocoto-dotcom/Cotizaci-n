@@ -13,7 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--br:#8B4513;--br-dark:#6B3010;--bg:#F7F3EE;--bg-warm:#F2EDE6;--card:#FFFFFF;--border:#E3D9CE;--text:#2C2416;--muted:#8A7968;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.07);--header-bg:#8B4513;--tag-bg:#F2EDE6;--tag-color:#8B4513}
+:root{--br:#2B6D49;--br-dark:#1E5235;--bg:#F7F3EE;--bg-warm:#F2EDE6;--card:#FFFFFF;--border:#E3D9CE;--text:#2C2416;--muted:#8A7968;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.07);--header-bg:#2B6D49;--tag-bg:#F2EDE6;--tag-color:#2B6D49}
 body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 header{background:var(--header-bg);color:#fff;padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15);position:sticky;top:0;z-index:100;transition:background .4s}
 .hlogo{display:flex;align-items:center;gap:10px}
@@ -331,32 +331,32 @@ const BRAND_CONFIG={
 'TARIFA MALANGA':{
 name:'Malanga',
 shortCode:'MAL',
-col:[106,50,18],col2:[85,38,12],
-accent:[180,130,60],
+col:[43,109,73],col2:[30,82,53],
+accent:[43,109,73],
 logoKey:'logo_malanga',
 razonSocial:'Malanga Restaurante',
 nit:'',direccion:'',tel:'',email:'',
-css:{br:'#6A3212',brDark:'#552606',bg:'#F7F3EE',bgWarm:'#F0E9DF',border:'#E3D5C4',text:'#2C1F0E',muted:'#8A7060',headerBg:'#6A3212',tagBg:'#F0E5D8',tagColor:'#7A4020'}
+css:{br:'#2B6D49',brDark:'#1E5235',bg:'#F7F3EE',bgWarm:'#F0E9DF',border:'#E3D5C4',text:'#2C1F0E',muted:'#8A7060',headerBg:'#2B6D49',tagBg:'#E8F5EE',tagColor:'#1E5235'}
 },
 'TARIFA ROCOTO':{
 name:'Rocoto',
 shortCode:'ROC',
 col:[20,20,20],col2:[10,10,10],
-accent:[212,160,23],
+accent:[251,197,25],
 logoKey:'logo_rocoto',
 razonSocial:'Rocoto Cocina Peruana',
 nit:'',direccion:'',tel:'',email:'',
-css:{br:'#D4A017',brDark:'#B88A10',bg:'#F5F5F5',bgWarm:'#EFEFEF',border:'#DCDCDC',text:'#1A1A1A',muted:'#777777',headerBg:'#1A1A1A',tagBg:'#FFF8E1',tagColor:'#B88A10'}
+css:{br:'#FBC519',brDark:'#C99E0D',bg:'#F5F5F5',bgWarm:'#EFEFEF',border:'#DCDCDC',text:'#1A1A1A',muted:'#777777',headerBg:'#1A1A1A',tagBg:'#FFF8E1',tagColor:'#C99E0D'}
 },
 'TARIFA HOTWINGS':{
 name:'Hot Wings',
 shortCode:'FOO',
 col:[20,20,20],col2:[10,10,10],
-accent:[230,100,10],
+accent:[135,28,24],
 logoKey:'logo_hotwings',
 razonSocial:'Foodwins / Hot Wings',
 nit:'',direccion:'',tel:'',email:'',
-css:{br:'#E6640A',brDark:'#C45508',bg:'#F5F4F2',bgWarm:'#EEEDE9',border:'#E0DDD8',text:'#1A1A1A',muted:'#777777',headerBg:'#1A1A1A',tagBg:'#FFF3E0',tagColor:'#C45508'}
+css:{br:'#871C18',brDark:'#6A1614',bg:'#F5F4F2',bgWarm:'#EEEDE9',border:'#E0DDD8',text:'#1A1A1A',muted:'#777777',headerBg:'#1A1A1A',tagBg:'#FDECEA',tagColor:'#6A1614'}
 }
 };
 
@@ -369,18 +369,18 @@ function setBrand(key){
   window._currentBrand=key;
   const r=document.documentElement;
   const cv=cfg.css||{};
-  r.style.setProperty('--br',cv.br||'#8B4513');
-  r.style.setProperty('--br-dark',cv.brDark||'#6B3010');
+  r.style.setProperty('--br',cv.br||'#2B6D49');
+  r.style.setProperty('--br-dark',cv.brDark||'#1E5235');
   r.style.setProperty('--bg',cv.bg||'#F7F3EE');
   r.style.setProperty('--bg-warm',cv.bgWarm||'#F2EDE6');
   r.style.setProperty('--border',cv.border||'#E3D9CE');
   r.style.setProperty('--text',cv.text||'#2C2416');
   r.style.setProperty('--muted',cv.muted||'#8A7968');
-  r.style.setProperty('--header-bg',cv.headerBg||'#8B4513');
+  r.style.setProperty('--header-bg',cv.headerBg||'#2B6D49');
   r.style.setProperty('--tag-bg',cv.tagBg||'#F2EDE6');
-  r.style.setProperty('--tag-color',cv.tagColor||'#8B4513');
+  r.style.setProperty('--tag-color',cv.tagColor||'#2B6D49');
   const hdr=document.querySelector('header');
-  if(hdr)hdr.style.background=cv.headerBg||'#8B4513';
+  if(hdr)hdr.style.background=cv.headerBg||'#2B6D49';
   const h1=document.querySelector('.hlogo h1');
   if(h1)h1.textContent=cfg.name;
   const sub=document.querySelector('.hlogo small');
