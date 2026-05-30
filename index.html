@@ -93,6 +93,13 @@ input:checked+.slider:before{transform:translateX(22px)}
 .trow .val{font-weight:700}
 .trow.excl-line .lbl,.trow.excl-line .val{color:var(--br)}
 .ttotal{display:flex;justify-content:space-between;padding:9px 0 0;margin-top:5px;border-top:2.5px solid var(--br);font-size:1.03rem;font-weight:800;color:var(--br2)}
+.trow.bold .lbl,.trow.bold .val{font-weight:800;color:var(--text)}
+.trow.total-noprop .lbl,.trow.total-noprop .val{font-weight:700;color:#555}
+.trow.prop-line .lbl,.trow.prop-line .val{color:#e67e22;font-weight:700}
+.ttotal-prop{display:flex;justify-content:space-between;padding:9px 0 0;margin-top:5px;border-top:2.5px solid var(--br);font-size:1.05rem;font-weight:800;color:var(--br2)}
+.propina-row{display:flex;align-items:center;gap:8px;padding:8px 18px 6px;border-top:1px solid var(--border);background:#fffdf5}
+.propina-row label{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;flex:1;cursor:pointer}
+.propina-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--br)}
 .qacts{padding:13px 18px 18px;display:flex;flex-direction:column;gap:7px}
 .bpdf{width:100%;padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;font-size:.95rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.3px}
 .bpdf:hover{opacity:.9}
@@ -170,10 +177,19 @@ input:checked+.slider:before{transform:translateX(22px)}
         <label>Valor Exclusividad ($)</label>
         <input type="number" id="exclVal" placeholder="0" min="0" step="1000"/>
       </div>
+      <div class="propina-row" id="propinaRow" style="display:none">
+        <input type="checkbox" id="propCheck" checked/>
+        <label for="propCheck">Incluir propina sugerida (10%)</label>
+      </div>
       <div class="qlist" id="qlist"><div class="empty">A&#250;n no hay productos en la cotizaci&#243;n.</div></div>
       <div class="tots" id="tots">
         <div id="catTots"></div>
-        <div class="ttotal"><span>Total General</span><span id="ttotal">$0</span></div>
+        <div class="trow bold" id="rowSubtotal" style="display:none"><span class="lbl">Subtotal</span><span class="val" id="valSubtotal">$0</span></div>
+        <div class="trow" id="rowImpo" style="display:none"><span class="lbl">Impoconsumo (8%)</span><span class="val" id="valImpo">$0</span></div>
+        <div class="trow total-noprop" id="rowSinProp" style="display:none"><span class="lbl">Total sin propina</span><span class="val" id="valSinProp">$0</span></div>
+        <div class="trow prop-line" id="rowProp" style="display:none"><span class="lbl">Propina sugerida (10%)</span><span class="val" id="valProp">$0</span></div>
+        <div class="ttotal" id="rowTotal"><span>Total General</span><span id="ttotal">$0</span></div>
+        <div class="ttotal-prop" id="rowTotalProp" style="display:none"><span>Total con propina</span><span id="ttotalProp">$0</span></div>
       </div>
       <div class="qacts">
         <button class="bpdf" id="bpdf" disabled>
@@ -199,15 +215,175 @@ function catTag(cat){if(cat==='bebidas')return'<span class="pcat-b">Bebida<\/spa
 function renderProducts(){const search=(document.getElementById('search').value||'').toLowerCase().trim();const sc=(document.getElementById('searchCode').value||'').toLowerCase().trim();let list=allProducts;if(activeCat!=='todos')list=list.filter(p=>p.cat===activeCat);if(activeFam!=='TODOS')list=list.filter(p=>p.familia===activeFam);if(search)list=list.filter(p=>p.nombre.toLowerCase().includes(search));if(sc)list=list.filter(p=>p.codigo.toLowerCase().includes(sc)||p.nombre.toLowerCase().includes(sc));document.getElementById('pcount').textContent=list.length+' art\u00edculos';if(!list.length){document.getElementById('pcont').innerHTML='<div class="msg">No se encontraron productos.<\/div>';return;}const rows=list.map(p=>'<tr><td><div class="pn">'+p.nombre+'<\/div>'+(p.codigo?'<div class="pc">'+p.codigo+'<\/div>':'')+'<span class="pfam">'+p.familia+'<\/span>'+catTag(p.cat)+'<\/td><td class="ppr">'+fmt(p.precio)+'<\/td><td><div class="qc"><input class="qi" type="number" min="1" value="1" id="qi_'+p.id+'"><button class="ba" data-id="'+p.id+'">+ Agregar<\/button><\/div><\/td><\/tr>').join('');document.getElementById('pcont').innerHTML='<div class="ptw"><table class="pt"><thead><tr><td>Producto / C\u00f3digo<\/td><td>Precio<\/td><td>Cant.<\/td><\/tr><\/thead><tbody>'+rows+'<\/tbody><\/table><\/div>';document.getElementById('pcont').querySelectorAll('.ba').forEach(btn=>{btn.addEventListener('click',()=>{const id=parseInt(btn.dataset.id);const qty=parseInt(document.getElementById('qi_'+id).value)||1;addToQuote(id,qty);});});}
 function addToQuote(id,qty){const prod=allProducts.find(p=>p.id===id);if(!prod)return;const ex=quote.find(q=>q.id===id);if(ex){ex.qty+=qty;}else{quote.push(Object.assign({},prod,{qty}));}renderQuote();toast(prod.nombre+' agregado (\u00d7'+qty+')','ok');}
 function renderQuote(){const el=document.getElementById('qlist');document.getElementById('qcount').textContent=quote.reduce((s,q)=>s+q.qty,0);if(!quote.length){el.innerHTML='<div class="empty">A\u00fan no hay productos en la cotizaci\u00f3n.<\/div>';document.getElementById('bpdf').disabled=true;updateTotals();return;}document.getElementById('bpdf').disabled=false;el.innerHTML=quote.map((q,i)=>'<div class="qitem"><div class="qiinfo"><div class="qiname">'+q.nombre+'<\/div><div class="qimeta">'+q.familia+' &bull; '+q.qty+' &times; '+fmt(q.precio)+'<\/div><\/div><div class="qisub">'+fmt(q.qty*q.precio)+'<\/div><button class="brm" data-i="'+i+'" title="Quitar">&times;<\/button><\/div>').join('');el.querySelectorAll('.brm').forEach(b=>{b.addEventListener('click',()=>{quote.splice(parseInt(b.dataset.i),1);renderQuote();});});updateTotals();}
-function updateTotals(){const exclOn=document.getElementById('exclToggle').checked;const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;const byFam={};quote.forEach(q=>{const k=q.familia||'OTROS';byFam[k]=(byFam[k]||0)+(q.qty*q.precio);});const catEl=document.getElementById('catTots');let rows=Object.entries(byFam).map(([k,v])=>'<div class="trow"><span class="lbl">'+k+'<\/span><span class="val">'+fmt(v)+'<\/span><\/div>').join('');if(exclOn&&exclAmt>0)rows+='<div class="trow excl-line"><span class="lbl">&#127976; Exclusividad<\/span><span class="val">'+fmt(exclAmt)+'<\/span><\/div>';catEl.innerHTML=rows;const sub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);document.getElementById('ttotal').textContent=fmt(sub+exclAmt);}
-function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+(type==='ok'?'ok':'err');setTimeout(()=>t.className='',2400);}
-function generatePDF(){const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});const bSel=document.getElementById('brandSel');const bName=bSel.options[bSel.selectedIndex].text;const cName=document.getElementById('cname').value||'Cliente';const obs=document.getElementById('obsField').value||'';const exclOn=document.getElementById('exclToggle').checked;const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});const isRoc=bSel.value==='TARIFA HOTWINGS';const col=isRoc?[192,57,43]:[44,110,73];doc.setFillColor(...col);doc.rect(0,0,210,28,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('COTIZACI\u00d3N - '+bName.toUpperCase(),14,17);doc.setFontSize(9);doc.setFont(undefined,'normal');doc.text(fecha,196,17,{align:'right'});doc.setTextColor(50,50,50);doc.setFontSize(10);doc.setFont(undefined,'bold');doc.text('Cliente:',14,36);doc.setFont(undefined,'normal');doc.text(cName,35,36);const sub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);doc.setFont(undefined,'bold');doc.text('Total:',14,42);doc.setFont(undefined,'normal');doc.text(fmt(sub+exclAmt),35,42);const body=quote.map(q=>[q.codigo||'-',q.nombre,q.familia,q.qty,fmt(q.precio),fmt(q.qty*q.precio)]);if(exclOn&&exclAmt>0)body.push(['','Exclusividad del Espacio','',1,fmt(exclAmt),fmt(exclAmt)]);doc.autoTable({startY:48,head:[['C\u00f3digo','Producto','Familia','Cant.','Precio Unit.','Subtotal']],body,headStyles:{fillColor:col,textColor:[255,255,255],fontStyle:'bold',fontSize:8},bodyStyles:{fontSize:8},alternateRowStyles:{fillColor:[248,248,248]},columnStyles:{0:{cellWidth:22},3:{cellWidth:14,halign:'center'},4:{cellWidth:28,halign:'right'},5:{cellWidth:28,halign:'right'}},margin:{left:14,right:14}});let y=doc.lastAutoTable.finalY+8;doc.setFillColor(240,240,240);doc.rect(14,y-2,182,8,'F');doc.setFontSize(10);doc.setFont(undefined,'bold');doc.setTextColor(...col);doc.text('TOTAL GENERAL: '+fmt(sub+exclAmt),196,y+4,{align:'right'});if(obs){y+=14;doc.setTextColor(50,50,50);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text('Observaciones:',14,y);doc.setFont(undefined,'normal');const obsL=doc.splitTextToSize(obs,182);doc.text(obsL,14,y+5);y+=5+obsL.length*4;}if(exclOn&&exclAmt>0){y+=8;const lc=col.map(c=>Math.min(c+180,255));doc.setFillColor(...lc);doc.rect(14,y-3,182,10,'F');doc.setTextColor(...col);doc.setFontSize(9);doc.setFont(undefined,'bold');doc.text('\u2605 EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt),14,y+4);}doc.setFontSize(7);doc.setTextColor(150,150,150);doc.setFont(undefined,'normal');doc.text('Documento generado autom\u00e1ticamente | '+bName+' \u2022 '+new Date().toLocaleString('es-CO'),105,290,{align:'center'});const safe=cName.replace(/[^a-z0-9]/gi,'_');doc.save('Cotizacion_'+bName+'_'+safe+'.pdf');toast('PDF generado con \u00e9xito','ok');}
+function updateTotals(){
+  const exclOn=document.getElementById('exclToggle').checked;
+  const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;
+  const byFam={};
+  quote.forEach(q=>{const k=q.familia||'OTROS';byFam[k]=(byFam[k]||0)+(q.qty*q.precio);});
+  const catEl=document.getElementById('catTots');
+  let rows=Object.entries(byFam).map(([k,v])=>'<div class="trow"><span class="lbl">'+k+'<\/span><span class="val">'+fmt(v)+'<\/span><\/div>').join('');
+  if(exclOn&&exclAmt>0)rows+='<div class="trow excl-line"><span class="lbl">&#127976; Exclusividad<\/span><span class="val">'+fmt(exclAmt)+'<\/span><\/div>';
+  catEl.innerHTML=rows;
+
+  const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
+  const subtotal=productSub+exclAmt;
+  const impo=Math.round(subtotal*0.08);
+  const totalSinProp=subtotal+impo;
+  const propBase=subtotal; // propina on subtotal only (before impo)
+  const propina=Math.round(propBase*0.10);
+  const totalConProp=totalSinProp+propina;
+
+  const hasItems=quote.length>0;
+  const propCheck=document.getElementById('propCheck');
+  const inclProp=propCheck?propCheck.checked:false;
+
+  // Show/hide propina row toggle
+  const propinaRow=document.getElementById('propinaRow');
+  if(propinaRow) propinaRow.style.display=hasItems?'flex':'none';
+
+  // Update breakdown rows
+  const set=(id,val,show)=>{const el=document.getElementById(id);if(el){el.textContent=fmt(val);el.parentElement.style.display=show?'flex':'none';}};
+  set('valSubtotal',subtotal,hasItems);
+  set('valImpo',impo,hasItems);
+  set('valSinProp',totalSinProp,hasItems);
+  set('valProp',propina,hasItems&&inclProp);
+  document.getElementById('rowProp').style.display=(hasItems&&inclProp)?'flex':'none';
+  document.getElementById('rowTotalProp').style.display=(hasItems&&inclProp)?'flex':'none';
+  document.getElementById('rowTotal').style.display=(hasItems&&!inclProp)?'flex':'none';
+
+  if(hasItems&&inclProp){
+    document.getElementById('ttotalProp').textContent=fmt(totalConProp);
+    document.getElementById('ttotal').textContent=fmt(totalConProp);
+  } else {
+    document.getElementById('ttotal').textContent=fmt(totalSinProp||subtotal);
+    if(!hasItems) document.getElementById('ttotal').textContent='$0';
+  }
+}function generatePDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const bSel=document.getElementById('brandSel');
+  const bName=bSel.options[bSel.selectedIndex].text;
+  const cName=document.getElementById('cname').value||'Cliente';
+  const obs=document.getElementById('obsField').value||'';
+  const exclOn=document.getElementById('exclToggle').checked;
+  const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;
+  const propCheck=document.getElementById('propCheck');
+  const inclProp=propCheck?propCheck.checked:false;
+  const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  const isRoc=bSel.value==='TARIFA HOTWINGS';
+  const col=isRoc?[192,57,43]:[44,110,73];
+
+  // Calculations
+  const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
+  const subtotal=productSub+exclAmt;
+  const impo=Math.round(subtotal*0.08);
+  const totalSinProp=subtotal+impo;
+  const propina=Math.round(subtotal*0.10);
+  const totalConProp=totalSinProp+propina;
+  const displayTotal=inclProp?totalConProp:totalSinProp;
+
+  // Header
+  doc.setFillColor(...col);doc.rect(0,0,210,28,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');
+  doc.text('COTIZACI\u00d3N - '+bName.toUpperCase(),14,17);
+  doc.setFontSize(9);doc.setFont(undefined,'normal');doc.text(fecha,196,17,{align:'right'});
+
+  // Client info
+  doc.setTextColor(50,50,50);doc.setFontSize(10);
+  doc.setFont(undefined,'bold');doc.text('Cliente:',14,36);
+  doc.setFont(undefined,'normal');doc.text(cName,35,36);
+  doc.setFont(undefined,'bold');doc.text('Total:',14,42);
+  doc.setFont(undefined,'normal');doc.text(fmt(displayTotal),35,42);
+
+  // Products table
+  const body=quote.map(q=>[q.codigo||'-',q.nombre,q.familia,q.qty,fmt(q.precio),fmt(q.qty*q.precio)]);
+  if(exclOn&&exclAmt>0)body.push(['','Exclusividad del Espacio','',1,fmt(exclAmt),fmt(exclAmt)]);
+
+  doc.autoTable({
+    startY:48,
+    head:[['C\u00f3digo','Producto','Familia','Cant.','Precio Unit.','Subtotal']],
+    body,
+    headStyles:{fillColor:col,textColor:[255,255,255],fontStyle:'bold',fontSize:8},
+    bodyStyles:{fontSize:8},
+    alternateRowStyles:{fillColor:[248,248,248]},
+    columnStyles:{0:{cellWidth:22},3:{cellWidth:14,halign:'center'},4:{cellWidth:28,halign:'right'},5:{cellWidth:28,halign:'right'}},
+    margin:{left:14,right:14}
+  });
+
+  let y=doc.lastAutoTable.finalY+6;
+
+  // Totals box
+  const boxX=110, boxW=86, lineH=7;
+  const totLines=[
+    {label:'Subtotal',val:fmt(subtotal),bold:false},
+    {label:'Impoconsumo (8%)',val:fmt(impo),bold:false},
+    {label:'Total sin propina',val:fmt(totalSinProp),bold:true},
+  ];
+  if(inclProp){
+    totLines.push({label:'Propina sugerida (10%)',val:fmt(propina),bold:false,color:[230,126,34]});
+    totLines.push({label:'TOTAL CON PROPINA',val:fmt(totalConProp),bold:true,big:true,highlight:true});
+  } else {
+    totLines.push({label:'TOTAL',val:fmt(totalSinProp),bold:true,big:true,highlight:true});
+  }
+
+  const boxH=totLines.length*lineH+6;
+  doc.setFillColor(248,248,248);doc.rect(boxX,y,boxW,boxH,'F');
+  doc.setDrawColor(...col);doc.setLineWidth(0.5);doc.rect(boxX,y,boxW,boxH);
+
+  let ty=y+5;
+  totLines.forEach(line=>{
+    if(line.highlight){
+      doc.setFillColor(...col);doc.rect(boxX,ty-4,boxW,lineH+1,'F');
+      doc.setTextColor(255,255,255);
+    } else if(line.color){
+      doc.setTextColor(...line.color);
+    } else {
+      doc.setTextColor(50,50,50);
+    }
+    doc.setFontSize(line.big?9.5:8);
+    doc.setFont(undefined,line.bold?'bold':'normal');
+    doc.text(line.label,boxX+3,ty);
+    doc.text(line.val,boxX+boxW-3,ty,{align:'right'});
+    ty+=lineH;
+  });
+  doc.setTextColor(50,50,50);
+
+  y+=boxH+8;
+
+  // Observations
+  if(obs){
+    doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(50,50,50);
+    doc.text('Observaciones:',14,y);
+    doc.setFont(undefined,'normal');
+    const obsL=doc.splitTextToSize(obs,182);
+    doc.text(obsL,14,y+5);
+    y+=5+obsL.length*4;
+  }
+
+  // Exclusivity badge
+  if(exclOn&&exclAmt>0){
+    y+=4;
+    const lc=col.map(c=>Math.min(c+180,255));
+    doc.setFillColor(...lc);doc.rect(14,y-3,182,10,'F');
+    doc.setTextColor(...col);doc.setFontSize(9);doc.setFont(undefined,'bold');
+    doc.text('\u2605 EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt),14,y+4);
+  }
+
+  // Footer
+  doc.setFontSize(7);doc.setTextColor(150,150,150);doc.setFont(undefined,'normal');
+  doc.text('Documento generado autom\u00e1ticamente | '+bName+' \u2022 '+new Date().toLocaleString('es-CO'),105,290,{align:'center'});
+
+  const safe=cName.replace(/[^a-z0-9]/gi,'_');
+  doc.save('Cotizacion_'+bName+'_'+safe+'.pdf');
+  toast('PDF generado con \u00e9xito','ok');
+}
 document.getElementById('brandSel').addEventListener('change',e=>{const val=e.target.value;if(!val)return;const bName=e.target.options[e.target.selectedIndex].text;document.getElementById('htitle').textContent='Cotizaciones '+bName;document.getElementById('hsub').textContent='Cargando cat\u00e1logo...';setBrand(val==='TARIFA HOTWINGS'?'rocoto':'malanga');loadProducts(val).then(()=>{document.getElementById('hsub').textContent=allProducts.length+' productos disponibles';});});
 document.getElementById('search').addEventListener('input',renderProducts);
 document.getElementById('searchCode').addEventListener('input',renderProducts);
 document.querySelectorAll('.cat-chip').forEach(btn=>{btn.addEventListener('click',()=>{activeCat=btn.dataset.cat;document.querySelectorAll('.cat-chip').forEach(b=>b.classList.toggle('active',b===btn));activeFam='TODOS';buildFamTabs();renderProducts();});});
 document.getElementById('exclToggle').addEventListener('change',function(){document.getElementById('exclLabel').textContent=this.checked?'S\u00ed':'No';document.getElementById('exclValBox').classList.toggle('show',this.checked);updateTotals();});
 document.getElementById('exclVal').addEventListener('input',updateTotals);
+document.getElementById('propCheck').addEventListener('change',updateTotals);
 document.getElementById('bpdf').addEventListener('click',generatePDF);
 document.getElementById('bclr').addEventListener('click',()=>{if(!quote.length)return;quote=[];renderQuote();toast('Cotizaci\u00f3n limpiada','ok');});
 </script>
