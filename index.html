@@ -8,9 +8,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--br:#2C6E49;--br2:#1B4332;--bg:#F4F6F9;--card:#fff;--border:#E0E0E0;--text:#333;--muted:#7f8c8d;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.08)}
+:root{--br:#8B4513;--br-dark:#6B3010;--bg:#F7F3EE;--bg-warm:#F2EDE6;--card:#FFFFFF;--border:#E3D9CE;--text:#2C2416;--muted:#8A7968;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.07);--header-bg:#8B4513;--tag-bg:#F2EDE6;--tag-color:#8B4513}
 body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-header{background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.18);position:sticky;top:0;z-index:100;transition:background .4s}
+header{background:var(--header-bg);color:#fff;padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.15);position:sticky;top:0;z-index:100;transition:background .4s}
 .hlogo{display:flex;align-items:center;gap:10px}
 .hlogo h1{font-size:1.15rem;font-weight:700}
 .hlogo small{font-size:.75rem;opacity:.8;display:block}
@@ -27,29 +27,29 @@ header{background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;paddin
 main{max-width:1320px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 410px;gap:20px;align-items:start}
 @media(max-width:980px){main{grid-template-columns:1fr;padding:12px}}
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.ch{padding:13px 20px;background:linear-gradient(90deg,var(--br),var(--br2));color:#fff;display:flex;align-items:center;gap:9px}
+.ch{padding:13px 20px;background:var(--header-bg);color:#fff;display:flex;align-items:center;gap:9px}
 .ch h2{font-size:.97rem;font-weight:700}
 .ch .badge{margin-left:auto;background:rgba(255,255,255,.25);border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700}
 .ptw{padding:0;max-height:calc(100vh - 200px);overflow:auto}
 .pt{width:100%;border-collapse:collapse;font-size:.85rem}
 .pt thead th{text-align:left;padding:9px 14px;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border);position:sticky;top:0;background:#fff;white-space:nowrap}
 .pt tbody tr{border-bottom:1px solid #f0f0f0;transition:background .15s}
-.pt tbody tr:hover{background:#f5fff8}
+.pt tbody tr:hover{background:var(--bg-warm)}
 .pt td{padding:8px 14px;vertical-align:middle}
 .pn{font-weight:600;font-size:.88rem}
-.pfam{font-size:.68rem;background:#eef6f0;color:var(--br);padding:1px 6px;border-radius:10px;font-weight:700;display:inline-block}
-.ppr{font-weight:800;color:var(--br2);white-space:nowrap;font-size:.88rem}
+.pfam{font-size:.68rem;background:var(--tag-bg);color:var(--tag-color);padding:2px 8px;border-radius:4px;font-weight:700;display:inline-block;letter-spacing:.2px}
+.ppr{font-weight:800;color:var(--br-dark);white-space:nowrap;font-size:.88rem}
 .qc{display:flex;align-items:center;gap:5px}
 .qi{width:52px;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:.88rem;text-align:center;outline:none}
 .ba{padding:5px 12px;border-radius:6px;border:none;background:var(--br);color:#fff;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap}
-.ba:hover{background:var(--br2)}
+.ba:hover{background:var(--br-dark)}
 .msg{text-align:center;padding:40px 18px;color:var(--muted);font-size:.93rem}
 .spin{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--br);border-radius:50%;animation:sp .7s linear infinite;margin-bottom:8px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .qpanel{position:sticky;top:130px}
-.qpanel .ch{background:linear-gradient(90deg,#1a1a2e,#16213e)}
+.qpanel .ch{background:var(--header-bg)}
 /* Client form section */
-.cform{padding:14px 16px;border-bottom:1px solid var(--border);background:#fafefe}
+.cform{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--card)}
 .cform h3{font-size:.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .cform-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cf{display:flex;flex-direction:column;gap:3px}
@@ -73,7 +73,7 @@ input:checked+.slider:before{transform:translateX(22px)}
 .excl-val-box label{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
 .excl-val-box input{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:.86rem;outline:none}
 .excl-val-box input:focus{border-color:var(--br)}
-.propina-row{display:flex;align-items:center;gap:8px;padding:7px 16px 6px;border-bottom:1px solid var(--border);background:#fffdf5;display:none}
+.propina-row{display:flex;align-items:center;gap:8px;padding:7px 16px 6px;border-bottom:1px solid var(--border);background:var(--bg-warm);display:none}
 .propina-row label{font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;flex:1;cursor:pointer}
 .propina-row input[type=checkbox]{width:15px;height:15px;cursor:pointer;accent-color:var(--br)}
 .qlist{max-height:220px;overflow:auto;padding:8px 16px}
@@ -81,29 +81,29 @@ input:checked+.slider:before{transform:translateX(22px)}
 .qiinfo{flex:1;min-width:0}
 .qiname{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qimeta{font-size:.71rem;color:var(--muted);margin-top:2px}
-.qisub{font-weight:800;font-size:.84rem;white-space:nowrap;color:var(--br2)}
+.qisub{font-weight:800;font-size:.84rem;white-space:nowrap;color:var(--br-dark)}
 .brm{background:none;border:none;cursor:pointer;color:#e74c3c;padding:2px;border-radius:4px;opacity:.6;flex-shrink:0}
 .brm:hover{opacity:1}
 .empty{text-align:center;padding:20px 0;color:var(--muted);font-size:.84rem}
-.tots{padding:12px 16px 8px;border-top:1px solid var(--border);background:#fafafa}
+.tots{padding:12px 16px 8px;border-top:1px solid var(--border);background:var(--bg-warm)}
 .trow{display:flex;justify-content:space-between;padding:3px 0;font-size:.86rem}
 .trow .lbl{color:var(--muted)}
 .trow .val{font-weight:700}
 .trow.bold .lbl,.trow.bold .val{font-weight:800;color:var(--text)}
-.trow.prop-line .lbl,.trow.prop-line .val{color:#e67e22;font-weight:700}
+.trow.prop-line .lbl,.trow.prop-line .val{color:var(--br);font-weight:700}
 .trow.excl-line .lbl,.trow.excl-line .val{color:var(--br);font-weight:700}
-.ttotal{display:flex;justify-content:space-between;padding:8px 0 0;margin-top:4px;border-top:2px solid var(--br);font-size:1rem;font-weight:800;color:var(--br2)}
-.ttotal-prop{display:flex;justify-content:space-between;padding:8px 0 0;margin-top:4px;border-top:2px solid var(--br);font-size:1rem;font-weight:800;color:var(--br2)}
+.ttotal{display:flex;justify-content:space-between;padding:8px 0 0;margin-top:4px;border-top:2px solid var(--br);font-size:1rem;font-weight:800;color:var(--br-dark)}
+.ttotal-prop{display:flex;justify-content:space-between;padding:8px 0 0;margin-top:4px;border-top:2px solid var(--br);font-size:1rem;font-weight:800;color:var(--br-dark)}
 .qacts{padding:12px 16px 16px;display:flex;flex-direction:column;gap:7px}
-.bpdf{width:100%;padding:11px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;font-size:.9rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.bpdf{width:100%;padding:12px;border-radius:8px;border:none;background:var(--header-bg);color:#fff;font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.3px}
 .bpdf:hover{opacity:.9}
 .bpdf:disabled{opacity:.35;cursor:not-allowed}
 .btn-row{display:flex;gap:7px}
-.bnew{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--br);background:transparent;color:var(--br);font-size:.8rem;font-weight:700;cursor:pointer}
-.bnew:hover{background:#eef6f0}
+.bnew{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--br);background:transparent;color:var(--br);font-size:.8rem;font-weight:600;cursor:pointer}
+.bnew:hover{background:var(--bg-warm)}
 .bclr{flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-weight:700;cursor:pointer}
 .bclr:hover{border-color:#e74c3c;color:#e74c3c}
-#toast{position:fixed;bottom:22px;right:22px;background:#2C3E50;color:#fff;padding:10px 18px;border-radius:8px;font-size:.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s;z-index:9999;pointer-events:none;max-width:270px}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--text);color:#fff;padding:10px 18px;border-radius:8px;font-size:.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s;z-index:9999;pointer-events:none;max-width:270px}
 #toast.show{opacity:1;transform:translateY(0)}
 #toast.ok{background:#27ae60}
 #toast.err{background:#e74c3c}
@@ -240,42 +240,36 @@ const fmt=n=>'$'+Math.round(n).toLocaleString('es-CO');
 
 // Brand configuration with logo URLs (hosted on GitHub or as data URLs)
 const BRAND_CONFIG={
-  'TARIFA MALANGA':{
-    name:'Malanga',
-    shortCode:'MAL',
-    col:[30,74,45],col2:[18,48,28],
-    accent:[162,140,70],
-    logoKey:'logo_malanga',
-    razonSocial:'Malanga Restaurante',
-    nit:'',
-    direccion:'',
-    tel:'',
-    email:''
-  },
-  'TARIFA ROCOTO':{
-    name:'Rocoto',
-    shortCode:'ROC',
-    col:[22,22,22],col2:[10,10,10],
-    accent:[212,160,23],
-    logoKey:'logo_rocoto',
-    razonSocial:'Rocoto Cocina Peruana',
-    nit:'',
-    direccion:'',
-    tel:'',
-    email:''
-  },
-  'TARIFA HOTWINGS':{
-    name:'Foodwins / Hotwings',
-    shortCode:'FOO',
-    col:[139,20,20],col2:[100,12,12],
-    accent:[230,160,0],
-    logoKey:'logo_hotwings',
-    razonSocial:'Foodwins / Hot Wings',
-    nit:'',
-    direccion:'',
-    tel:'',
-    email:''
-  }
+'TARIFA MALANGA':{
+name:'Malanga',
+shortCode:'MAL',
+col:[106,50,18],col2:[85,38,12],
+accent:[180,130,60],
+logoKey:'logo_malanga',
+razonSocial:'Malanga Restaurante',
+nit:'',direccion:'',tel:'',email:'',
+css:{br:'#6A3212',brDark:'#552606',bg:'#F7F3EE',bgWarm:'#F0E9DF',border:'#E3D5C4',text:'#2C1F0E',muted:'#8A7060',headerBg:'#6A3212',tagBg:'#F0E5D8',tagColor:'#7A4020'}
+},
+'TARIFA ROCOTO':{
+name:'Rocoto',
+shortCode:'ROC',
+col:[20,20,20],col2:[10,10,10],
+accent:[212,160,23],
+logoKey:'logo_rocoto',
+razonSocial:'Rocoto Cocina Peruana',
+nit:'',direccion:'',tel:'',email:'',
+css:{br:'#D4A017',brDark:'#B88A10',bg:'#F5F5F5',bgWarm:'#EFEFEF',border:'#DCDCDC',text:'#1A1A1A',muted:'#777777',headerBg:'#1A1A1A',tagBg:'#FFF8E1',tagColor:'#B88A10'}
+},
+'TARIFA HOTWINGS':{
+name:'Hot Wings',
+shortCode:'FOO',
+col:[20,20,20],col2:[10,10,10],
+accent:[230,100,10],
+logoKey:'logo_hotwings',
+razonSocial:'Foodwins / Hot Wings',
+nit:'',direccion:'',tel:'',email:'',
+css:{br:'#E6640A',brDark:'#C45508',bg:'#F5F4F2',bgWarm:'#EEEDE9',border:'#E0DDD8',text:'#1A1A1A',muted:'#777777',headerBg:'#1A1A1A',tagBg:'#FFF3E0',tagColor:'#C45508'}
+}
 };
 
 // Logo store - images embedded as base64 (set at runtime from user-uploaded logos)
@@ -284,16 +278,25 @@ const LOGOS={};
 function setBrand(key){
   const cfg=BRAND_CONFIG[key];
   if(!cfg)return;
-  const [r1,g1,b1]=cfg.col;
-  const [r2,g2,b2]=cfg.col2;
-  const acc=cfg.accent||cfg.col;
-  const [a1,a2,a3]=acc;
+  window._currentBrand=key;
   const r=document.documentElement;
-  r.style.setProperty('--br','rgb('+a1+','+a2+','+a3+')');
-  r.style.setProperty('--br2','rgb('+r1+','+g1+','+b1+')');
-  const hdr=document.getElementById('hdr');
-  if(hdr)hdr.style.background='linear-gradient(135deg,rgb('+r1+','+g1+','+b1+'),rgb('+r2+','+g2+','+b2+'))';
-  document.getElementById('htitle').textContent='Cotizaciones '+cfg.name;
+  const cv=cfg.css||{};
+  r.style.setProperty('--br',cv.br||'#8B4513');
+  r.style.setProperty('--br-dark',cv.brDark||'#6B3010');
+  r.style.setProperty('--bg',cv.bg||'#F7F3EE');
+  r.style.setProperty('--bg-warm',cv.bgWarm||'#F2EDE6');
+  r.style.setProperty('--border',cv.border||'#E3D9CE');
+  r.style.setProperty('--text',cv.text||'#2C2416');
+  r.style.setProperty('--muted',cv.muted||'#8A7968');
+  r.style.setProperty('--header-bg',cv.headerBg||'#8B4513');
+  r.style.setProperty('--tag-bg',cv.tagBg||'#F2EDE6');
+  r.style.setProperty('--tag-color',cv.tagColor||'#8B4513');
+  const hdr=document.querySelector('header');
+  if(hdr)hdr.style.background=cv.headerBg||'#8B4513';
+  const h1=document.querySelector('.hlogo h1');
+  if(h1)h1.textContent=cfg.name;
+  const sub=document.querySelector('.hlogo small');
+  if(sub)sub.textContent='Sistema de Cotizaciones';
   updateQuoteNumberBadge(key);
 }
 
@@ -519,7 +522,6 @@ async function generatePDF(){
   doc.setFontSize(9);
   doc.setFont(undefined,'normal');
   doc.text('Cotización Nº '+quoteNum,textStartX,22);
-  doc.text(fecha,196,22,{align:'right'});
   doc.setFontSize(8);
   doc.text('Fecha: '+fecha,196,9,{align:'right'});
 
