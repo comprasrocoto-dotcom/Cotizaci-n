@@ -214,12 +214,11 @@ input:checked+.slider:before{transform:translateX(22px)}
       <div class="qlist" id="qlist"><div class="empty">A&#250;n no hay productos en la cotizaci&#243;n.</div></div>
       <div class="tots" id="tots">
         <div id="catTots"></div>
-        <div class="trow bold" id="rowSubtotal" style="display:none"><span class="lbl">Subtotal</span><span class="val" id="valSubtotal">$0</span></div>
-        <div class="trow" id="rowImpo" style="display:none"><span class="lbl">Impoconsumo (8%)</span><span class="val" id="valImpo">$0</span></div>
-        <div class="trow" id="rowSinProp" style="display:none"><span class="lbl">Total sin propina</span><span class="val" id="valSinProp">$0</span></div>
+        <div class="trow bold" id="rowSubtotal" style="display:none"><span class="lbl">Subtotal alim. y bebidas</span><span class="val" id="valSubtotal">$0</span></div>
+        <div class="trow" id="rowImpo" style="display:none"><span class="lbl">INC incluido (8%)</span><span class="val" id="valImpo">$0</span></div>
+        <div class="trow excl-line" id="rowExcl" style="display:none"><span class="lbl">&#127976; Exclusividad del espacio</span><span class="val" id="valExclTot">$0</span></div>
         <div class="trow prop-line" id="rowProp" style="display:none"><span class="lbl">Propina sugerida (10%)</span><span class="val" id="valProp">$0</span></div>
         <div class="ttotal" id="rowTotal" style="display:none"><span>Total General</span><span id="ttotal">$0</span></div>
-        <div class="ttotal-prop" id="rowTotalProp" style="display:none"><span>Total con propina</span><span id="ttotalProp">$0</span></div>
       </div>
       <div class="qacts">
         <button class="bpdf" id="bpdf" disabled>
@@ -388,6 +387,7 @@ function renderQuote(){
   updateTotals();
 }
 
+
 function updateTotals(){
   const exclOn=document.getElementById('exclToggle').checked;
   const exclAmt=exclOn?(parseFloat(document.getElementById('exclVal').value)||0):0;
@@ -395,42 +395,43 @@ function updateTotals(){
   quote.forEach(q=>{const k=q.familia||'OTROS';byFam[k]=(byFam[k]||0)+(q.qty*q.precio);});
   const catEl=document.getElementById('catTots');
   let rows=Object.entries(byFam).map(([k,v])=>'<div class="trow"><span class="lbl">'+k+'<\/span><span class="val">'+fmt(v)+'<\/span><\/div>').join('');
-  if(exclOn&&exclAmt>0)rows+='<div class="trow excl-line"><span class="lbl">&#127976; Exclusividad<\/span><span class="val">'+fmt(exclAmt)+'<\/span><\/div>';
   catEl.innerHTML=rows;
-  const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
-  const subtotal=productSub+exclAmt;
-  const impo=Math.round(subtotal*0.08);
-  const totalSinProp=subtotal+impo;
-  const propina=Math.round(subtotal*0.10);
-  const totalConProp=totalSinProp+propina;
+  // INC already included in prices: extract it informatively
+  const productTotal=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
+  const baseSinInc=Math.round(productTotal/1.08);
+  const inc=productTotal-baseSinInc;
+  // Propina: only on product total (alimentos y bebidas), NOT on exclusividad
+  const propinaBase=productTotal;
+  const propina=Math.round(propinaBase*0.10);
+  // Total general = products + exclusividad + propina (if applicable)
   const hasItems=quote.length>0;
   const propCheck=document.getElementById('propCheck');
   const inclProp=propCheck?propCheck.checked:false;
   const propinaRow=document.getElementById('propinaRow');
   if(propinaRow)propinaRow.style.display=hasItems?'flex':'none';
-  const set=(id,val,show)=>{const el=document.getElementById(id);if(el){el.textContent=fmt(val);el.parentElement.style.display=show?'flex':'none';}};
-  set('valSubtotal',subtotal,hasItems);
-  set('valImpo',impo,hasItems);
-  set('valSinProp',totalSinProp,hasItems);
-  set('valProp',propina,hasItems&&inclProp);
-  document.getElementById('rowProp').style.display=(hasItems&&inclProp)?'flex':'none';
-  document.getElementById('rowTotalProp').style.display=(hasItems&&inclProp)?'flex':'none';
-  document.getElementById('rowTotal').style.display=(hasItems&&!inclProp)?'flex':'none';
-  if(hasItems&&inclProp){
-    document.getElementById('ttotalProp').textContent=fmt(totalConProp);
-    document.getElementById('ttotal').textContent=fmt(totalConProp);
-  }else{
-    document.getElementById('ttotal').textContent=fmt(totalSinProp||subtotal);
-    if(!hasItems)document.getElementById('ttotal').textContent='$0';
-  }
+  const totalGeneral=productTotal+exclAmt+(inclProp?propina:0);
+  // Update UI rows
+  const show=(id,val,visible)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(val);const row=document.getElementById(id.replace('val','row'));if(row)row.style.display=visible?'flex':'none';};
+  // Subtotal alim y bebidas (prices as listed, INC included)
+  const elSub=document.getElementById('valSubtotal');if(elSub)elSub.textContent=fmt(productTotal);
+  const rowSub=document.getElementById('rowSubtotal');if(rowSub)rowSub.style.display=hasItems?'flex':'none';
+  // INC informativo
+  const elImpo=document.getElementById('valImpo');if(elImpo)elImpo.textContent=fmt(inc);
+  const rowImpo=document.getElementById('rowImpo');if(rowImpo)rowImpo.style.display=hasItems?'flex':'none';
+  // Exclusividad
+  const elExcl=document.getElementById('valExclTot');if(elExcl)elExcl.textContent=fmt(exclAmt);
+  const rowExcl=document.getElementById('rowExcl');if(rowExcl)rowExcl.style.display=(hasItems&&exclOn&&exclAmt>0)?'flex':'none';
+  // Propina
+  const elProp=document.getElementById('valProp');if(elProp)elProp.textContent=fmt(propina);
+  const rowProp=document.getElementById('rowProp');if(rowProp)rowProp.style.display=(hasItems&&inclProp)?'flex':'none';
+  // Total general
+  const elTotal=document.getElementById('ttotal');if(elTotal)elTotal.textContent=fmt(totalGeneral);
+  const rowTotal=document.getElementById('rowTotal');if(rowTotal)rowTotal.style.display=hasItems?'flex':'none';
+  // Remove old rows no longer used (rowSinProp, rowTotalProp)
+  const rowSinProp=document.getElementById('rowSinProp');if(rowSinProp)rowSinProp.style.display='none';
+  const rowTotalProp=document.getElementById('rowTotalProp');if(rowTotalProp)rowTotalProp.style.display='none';
 }
 
-function toast(msg,type){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='show '+(type==='ok'?'ok':'err');
-  setTimeout(()=>t.className='',2400);
-}
 // Convert image URL to base64 for PDF embedding
 function imgToBase64(url){
   return new Promise((resolve)=>{
@@ -455,9 +456,8 @@ async function generatePDF(){
   const brandKey=bSel.value;
   const cfg=BRAND_CONFIG[brandKey]||BRAND_CONFIG['TARIFA MALANGA'];
   const col=cfg.col;
-  const col2=cfg.col2;
 
-  // Get client data
+  // Client data
   const cNombre=(document.getElementById('cNombre').value||'').trim()||'Sin especificar';
   const cNit=(document.getElementById('cNit').value||'').trim();
   const cContacto=(document.getElementById('cContacto').value||'').trim();
@@ -473,22 +473,22 @@ async function generatePDF(){
   const propCheck=document.getElementById('propCheck');
   const inclProp=propCheck?propCheck.checked:false;
 
-  // Generate quote number (increments counter)
+  // Generate quote number
   const quoteNum=getNextQuoteNumber(brandKey);
   currentQuoteNum=quoteNum;
   updateQuoteNumberBadge(brandKey);
 
-  // Date
   const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
 
-  // Calculations
-  const productSub=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
-  const subtotal=productSub+exclAmt;
-  const impo=Math.round(subtotal*0.08);
-  const totalSinProp=subtotal+impo;
-  const propina=Math.round(subtotal*0.10);
-  const totalConProp=totalSinProp+propina;
-  const displayTotal=inclProp?totalConProp:totalSinProp;
+  // CORRECTED CALCULATIONS
+  // Prices from DB already include INC (8%)
+  const productTotal=quote.reduce((s,q)=>s+(q.qty*q.precio),0);
+  const baseSinInc=Math.round(productTotal/1.08);
+  const inc=productTotal-baseSinInc;
+  // Propina: only on product total (alimentos y bebidas), NOT exclusividad
+  const propinaBase=productTotal;
+  const propina=Math.round(propinaBase*0.10);
+  const totalGeneral=productTotal+exclAmt+(inclProp?propina:0);
 
   // === HEADER BAND ===
   doc.setFillColor(...col);
@@ -501,19 +501,13 @@ async function generatePDF(){
 
   let textStartX=14;
   if(logoB64){
-    try{
-      doc.addImage(logoB64,'PNG',12,4,28,28);
-      textStartX=44;
-    }catch(e){}
+    try{doc.addImage(logoB64,'PNG',12,4,28,28);textStartX=44;}catch(e){}
   }
 
-  // Brand name
   doc.setTextColor(255,255,255);
   doc.setFontSize(18);
   doc.setFont(undefined,'bold');
   doc.text(cfg.name.toUpperCase(),textStartX,15);
-
-  // Quote number and date on header
   doc.setFontSize(9);
   doc.setFont(undefined,'normal');
   doc.text('Cotización Nº '+quoteNum,textStartX,22);
@@ -528,51 +522,28 @@ async function generatePDF(){
   doc.setDrawColor(...col);
   doc.setLineWidth(0.4);
   doc.rect(12,y,186,32);
-
-  // Left column label bar
   doc.setFillColor(...col);
   doc.rect(12,y,42,7,'F');
   doc.setTextColor(255,255,255);
   doc.setFontSize(7.5);
   doc.setFont(undefined,'bold');
   doc.text('DATOS DEL CLIENTE',14,y+5);
-
   y+=9;
   doc.setTextColor(60,60,60);
-  doc.setFont(undefined,'bold');
-  doc.setFontSize(8);
-  doc.text('Razón Social:',14,y);
-  doc.setFont(undefined,'normal');
-  doc.text(cNombre,52,y);
-
+  doc.setFont(undefined,'bold');doc.setFontSize(8);
+  doc.text('Razón Social:',14,y);doc.setFont(undefined,'normal');doc.text(cNombre,52,y);
   y+=6;
-  doc.setFont(undefined,'bold');
-  doc.text('NIT / Cédula:',14,y);
-  doc.setFont(undefined,'normal');
-  doc.text(cNit||'---',52,y);
-
-  doc.setFont(undefined,'bold');
-  doc.text('Contacto:',110,y);
-  doc.setFont(undefined,'normal');
-  doc.text(cContacto||'---',132,y);
-
+  doc.setFont(undefined,'bold');doc.text('NIT / Cédula:',14,y);doc.setFont(undefined,'normal');doc.text(cNit||'---',52,y);
+  doc.setFont(undefined,'bold');doc.text('Contacto:',110,y);doc.setFont(undefined,'normal');doc.text(cContacto||'---',132,y);
   y+=6;
-  doc.setFont(undefined,'bold');
-  doc.text('Teléfono:',14,y);
-  doc.setFont(undefined,'normal');
-  doc.text(cTel||'---',52,y);
-
-  doc.setFont(undefined,'bold');
-  doc.text('Email:',110,y);
-  doc.setFont(undefined,'normal');
+  doc.setFont(undefined,'bold');doc.text('Teléfono:',14,y);doc.setFont(undefined,'normal');doc.text(cTel||'---',52,y);
+  doc.setFont(undefined,'bold');doc.text('Email:',110,y);doc.setFont(undefined,'normal');
   const emailText=cEmail||'---';
   doc.text(emailText.length>30?emailText.substring(0,30)+'...':emailText,132,y);
-
   y+=10;
 
   // === PRODUCTS TABLE ===
   const body=quote.map(q=>[q.nombre,q.qty,fmt(q.precio),fmt(q.qty*q.precio)]);
-  if(exclOn&&exclAmt>0)body.push(['Exclusividad del Espacio',1,fmt(exclAmt),fmt(exclAmt)]);
 
   doc.autoTable({
     startY:y,
@@ -585,20 +556,21 @@ async function generatePDF(){
     margin:{left:12,right:12}
   });
 
-  // === TOTALS BOX ===
+  // === TOTALS BOX (corrected) ===
   y=doc.lastAutoTable.finalY+6;
-  const boxX=112,boxW=86,lineH=7;
+  const boxX=100,boxW=98,lineH=7;
   const totLines=[
-    {label:'Subtotal',val:fmt(subtotal),bold:false},
-    {label:'Impoconsumo (8%)',val:fmt(impo),bold:false},
-    {label:'Total sin propina',val:fmt(totalSinProp),bold:true}
+    {label:'Subtotal alim. y bebidas',val:fmt(productTotal),bold:false},
+    {label:'INC incluido (8%)',val:fmt(inc),bold:false,gray:true},
   ];
-  if(inclProp){
-    totLines.push({label:'Propina sugerida (10%)',val:fmt(propina),bold:false,orange:true});
-    totLines.push({label:'TOTAL CON PROPINA',val:fmt(totalConProp),bold:true,highlight:true});
-  }else{
-    totLines.push({label:'TOTAL',val:fmt(totalSinProp),bold:true,highlight:true});
+  if(exclOn&&exclAmt>0){
+    totLines.push({label:'Exclusividad del espacio',val:fmt(exclAmt),bold:false,green:true});
   }
+  if(inclProp){
+    totLines.push({label:'Propina (10% sobre alim/beb)',val:fmt(propina),bold:false,orange:true});
+  }
+  totLines.push({label:'TOTAL GENERAL',val:fmt(totalGeneral),bold:true,highlight:true});
+
   const boxH=totLines.length*lineH+6;
   doc.setFillColor(248,248,248);
   doc.rect(boxX,y,boxW,boxH,'F');
@@ -611,11 +583,10 @@ async function generatePDF(){
       doc.setFillColor(...col);
       doc.rect(boxX,ty-4,boxW,lineH+1,'F');
       doc.setTextColor(255,255,255);
-    }else if(line.orange){
-      doc.setTextColor(230,126,34);
-    }else{
-      doc.setTextColor(50,50,50);
-    }
+    }else if(line.orange){doc.setTextColor(230,126,34);
+    }else if(line.green){doc.setTextColor(...col);
+    }else if(line.gray){doc.setTextColor(140,140,140);
+    }else{doc.setTextColor(50,50,50);}
     doc.setFontSize(line.highlight?9.5:8);
     doc.setFont(undefined,line.bold?'bold':'normal');
     doc.text(line.label,boxX+3,ty);
@@ -625,10 +596,17 @@ async function generatePDF(){
   doc.setTextColor(50,50,50);
   y+=boxH+8;
 
+  // Note about INC
+  doc.setFontSize(7);
+  doc.setTextColor(140,140,140);
+  doc.setFont(undefined,'italic');
+  doc.text('* Los precios incluyen Impuesto Nacional al Consumo (INC 8%). Propina calculada sobre alimentos y bebidas, excluye exclusividad.',12,y);
+  y+=6;
+
   // === OBSERVATIONS ===
   if(obs){
     if(y>240){doc.addPage();y=20;}
-    doc.setFontSize(9);doc.setFont(undefined,'bold');
+    doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(50,50,50);
     doc.text('Observaciones:',12,y);
     doc.setFont(undefined,'normal');
     const obsL=doc.splitTextToSize(obs,180);
@@ -636,7 +614,7 @@ async function generatePDF(){
     y+=5+obsL.length*4;
   }
 
-  // === EXCLUSIVITY NOTE ===
+  // === EXCLUSIVITY HIGHLIGHT ===
   if(exclOn&&exclAmt>0){
     y+=4;
     const lc=col.map(c=>Math.min(c+180,255));
@@ -644,7 +622,7 @@ async function generatePDF(){
     doc.rect(12,y-3,186,10,'F');
     doc.setTextColor(...col);
     doc.setFontSize(9);doc.setFont(undefined,'bold');
-    doc.text('★ EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt),14,y+4);
+    doc.text('★ EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt)+' (no incluida en base de propina)',14,y+4);
   }
 
   // === FOOTER ===
@@ -653,13 +631,12 @@ async function generatePDF(){
   doc.setFont(undefined,'normal');
   doc.text('Cotización '+quoteNum+' | '+cfg.name+' | '+fecha,105,288,{align:'center'});
 
-  // === SAVE with smart filename ===
-  const safeCliente=cNombre.replace(/[^a-z0-9áéíóúñàèìòù ]/gi,'').trim().replace(/s+/g,'_').substring(0,30);
+  // === SAVE ===
+  const safeCliente=cNombre.replace(/[^a-z0-9áéíóúñàèìòù ]/gi,'').trim().replace(/\s+/g,'_').substring(0,30);
   const filename='COT-'+quoteNum+'-'+safeCliente+'.pdf';
   doc.save(filename);
   toast('PDF '+quoteNum+' generado con éxito','ok');
 }
-// Event listeners
 document.getElementById('brandSel').addEventListener('change',e=>{
   const val=e.target.value;
   if(!val)return;
