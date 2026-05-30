@@ -214,10 +214,10 @@ input:checked+.slider:before{transform:translateX(22px)}
       <div class="qlist" id="qlist"><div class="empty">A&#250;n no hay productos en la cotizaci&#243;n.</div></div>
       <div class="tots" id="tots">
         <div id="catTots"></div>
-        <div class="trow bold" id="rowSubtotal" style="display:none"><span class="lbl">Subtotal alim. y bebidas</span><span class="val" id="valSubtotal">$0</span></div>
+        <div class="trow bold" id="rowSubtotal" style="display:none"><span class="lbl">Subtotal Base (sin INC)</span><span class="val" id="valSubtotal">$0</span></div>
         <div class="trow" id="rowImpo" style="display:none"><span class="lbl">INC incluido (8%)</span><span class="val" id="valImpo">$0</span></div>
         <div class="trow excl-line" id="rowExcl" style="display:none"><span class="lbl">&#127976; Exclusividad del espacio</span><span class="val" id="valExclTot">$0</span></div>
-        <div class="trow prop-line" id="rowProp" style="display:none"><span class="lbl">Propina sugerida (10%)</span><span class="val" id="valProp">$0</span></div>
+        <div class="trow prop-line" id="rowProp" style="display:none"><span class="lbl">Propina sugerida (10% sobre base)</span><span class="val" id="valProp">$0</span></div>
         <div class="ttotal" id="rowTotal" style="display:none"><span>Total General</span><span id="ttotal">$0</span></div>
       </div>
       <div class="qacts">
@@ -408,7 +408,7 @@ function updateTotals(){
   const baseSinInc=Math.round(productTotal/1.08);
   const inc=productTotal-baseSinInc;
   // Propina: only on product total (alimentos y bebidas), NOT on exclusividad
-  const propinaBase=productTotal;
+  const propinaBase=baseSinInc;
   const propina=Math.round(propinaBase*0.10);
   // Total general = products + exclusividad + propina (if applicable)
   const hasItems=quote.length>0;
@@ -420,7 +420,7 @@ function updateTotals(){
   // Update UI rows
   const show=(id,val,visible)=>{const el=document.getElementById(id);if(el)el.textContent=fmt(val);const row=document.getElementById(id.replace('val','row'));if(row)row.style.display=visible?'flex':'none';};
   // Subtotal alim y bebidas (prices as listed, INC included)
-  const elSub=document.getElementById('valSubtotal');if(elSub)elSub.textContent=fmt(productTotal);
+  const elSub=document.getElementById('valSubtotal');if(elSub)elSub.textContent=fmt(baseSinInc);
   const rowSub=document.getElementById('rowSubtotal');if(rowSub)rowSub.style.display=hasItems?'flex':'none';
   // INC informativo
   const elImpo=document.getElementById('valImpo');if(elImpo)elImpo.textContent=fmt(inc);
@@ -494,7 +494,7 @@ async function generatePDF(){
   const baseSinInc=Math.round(productTotal/1.08);
   const inc=productTotal-baseSinInc;
   // Propina: only on product total (alimentos y bebidas), NOT exclusividad
-  const propinaBase=productTotal;
+  const propinaBase=baseSinInc;
   const propina=Math.round(propinaBase*0.10);
   const totalGeneral=productTotal+exclAmt+(inclProp?propina:0);
 
@@ -569,14 +569,14 @@ async function generatePDF(){
   y=doc.lastAutoTable.finalY+6;
   const boxX=100,boxW=98,lineH=7;
   const totLines=[
-    {label:'Subtotal alim. y bebidas',val:fmt(productTotal),bold:false},
+    {label:'Subtotal Base (sin INC)',val:fmt(baseSinInc),bold:false},
     {label:'INC incluido (8%)',val:fmt(inc),bold:false,gray:true},
   ];
   if(exclOn&&exclAmt>0){
     totLines.push({label:'Exclusividad del espacio',val:fmt(exclAmt),bold:false,green:true});
   }
   if(inclProp){
-    totLines.push({label:'Propina (10% sobre alim/beb)',val:fmt(propina),bold:false,orange:true});
+    totLines.push({label:'Propina (10% sobre base s/INC)',val:fmt(propina),bold:false,orange:true});
   }
   totLines.push({label:'TOTAL GENERAL',val:fmt(totalGeneral),bold:true,highlight:true});
 
