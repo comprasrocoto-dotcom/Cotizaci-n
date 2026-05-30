@@ -622,142 +622,216 @@ async function generatePDF(){
   let logoB64=null;
   try{logoB64=await imgToBase64(logoUrl);}catch(e){}
 
-  let textStartX=14;
+
+  // ─── PDF DRAWING ─────────────────────────────────────────────
+  // Brand colors (RGB arrays)
+  const hC = col;                  // Header background
+  const aC = pdfAccent;            // Accent color (highlights, tags, propina)
+  const PW = 210, PH = 297;        // A4 dimensions
+  const ML = 15, MR = 15;         // Left/right margins
+  const UW = PW - ML - MR;        // Usable width = 180mm
+
+  // ── helpers ──────────────────────────────────────────────────
+  const fmtM = n => {
+    if(!n && n!==0) return '---';
+    const s = Math.round(n).toLocaleString('es-CO');
+    return '$'+s;
+  };
+  const row = (label, value, y, bold=false, accent=false, bg=null) => {
+    if(bg) { doc.setFillColor(...bg); doc.rect(ML,y-5,UW,8,'F'); }
+    doc.setFont('helvetica', bold?'bold':'normal');
+    doc.setFontSize(9);
+    if(accent){ doc.setTextColor(...aC); }
+    else if(bg){ doc.setTextColor(255,255,255); }
+    else { doc.setTextColor(55,55,55); }
+    doc.text(label, ML+3, y);
+    doc.setFont('helvetica', bold?'bold':'normal');
+    if(!accent && !bg) doc.setTextColor(30,30,30);
+    doc.text(value, PW-MR, y, {align:'right'});
+  };
+
+  // ── HEADER BLOCK ─────────────────────────────────────────────
+  doc.setFillColor(...hC);
+  doc.rect(0, 0, PW, 42, 'F');
+
+  // Logo
+  let textStartX = ML;
   if(logoB64){
-    try{doc.addImage(logoB64,'PNG',12,4,28,28);textStartX=44;}catch(e){}
+    try{ doc.addImage(logoB64,'PNG',ML,7,28,26); textStartX=ML+32; }catch(e){}
   }
 
+  // Brand name (if no logo or as fallback)
+  if(!logoB64){
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(22);
+    doc.text(cfg.name.toUpperCase(), ML, 22);
+  }
+
+  // Date — top right
+  // fecha already computed above
   doc.setTextColor(255,255,255);
-  doc.setFontSize(18);
-  doc.setFont(undefined,'bold');
-  doc.text(cfg.name.toUpperCase(),textStartX,15);
-  doc.setFontSize(9);
-  doc.setFont(undefined,'normal');
-  doc.text('Cotización Nº '+quoteNum,textStartX,22);
-  doc.setFontSize(8);
-  doc.text('Fecha: '+fecha,196,9,{align:'right'});
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  doc.text('Fecha: '+fecha, PW-MR, 10, {align:'right'});
 
-  // === CLIENT INFO BOX ===
-  let y=42;
-  doc.setFillColor(245,245,250);
-  doc.rect(12,y,186,32,'F');
-  doc.setDrawColor(...col);
-  doc.setLineWidth(0.4);
-  doc.rect(12,y,186,32);
-  doc.setFillColor(...pdfAccent);
-  doc.rect(12,y,42,7,'F');
-  const cbarBright=(pdfAccent[0]*299+pdfAccent[1]*587+pdfAccent[2]*114)/1000;
-  doc.setTextColor(cbarBright>128?30:255,cbarBright>128?20:255,cbarBright>128?5:255);
+  // Quote number — below date / brand name
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.setTextColor(230,230,230);
+  doc.text('Cotización Nº '+quoteNum, ML, 36);
+
+  // ── CLIENT DATA BOX ──────────────────────────────────────────
+  const cY = 50;
+  // Outer border
+  doc.setDrawColor(...aC);
+  doc.setLineWidth(0.6);
+  doc.rect(ML, cY, UW, 34, 'S');
+
+  // Header tab
+  doc.setFillColor(...hC);
+  doc.rect(ML, cY, 54, 8, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
   doc.setFontSize(7.5);
-  doc.setFont(undefined,'bold');
-  doc.text('DATOS DEL CLIENTE',14,y+5);
-  y+=9;
-  doc.setTextColor(60,60,60);
-  doc.setFont(undefined,'bold');doc.setFontSize(8);
-  doc.text('Razón Social:',14,y);doc.setFont(undefined,'normal');doc.text(cNombre,52,y);
-  y+=6;
-  doc.setFont(undefined,'bold');doc.text('NIT / Cédula:',14,y);doc.setFont(undefined,'normal');doc.text(cNit||'---',52,y);
-  doc.setFont(undefined,'bold');doc.text('Contacto:',110,y);doc.setFont(undefined,'normal');doc.text(cContacto||'---',132,y);
-  y+=6;
-  doc.setFont(undefined,'bold');doc.text('Teléfono:',14,y);doc.setFont(undefined,'normal');doc.text(cTel||'---',52,y);
-  doc.setFont(undefined,'bold');doc.text('Email:',110,y);doc.setFont(undefined,'normal');
-  const emailText=cEmail||'---';
-  doc.text(emailText.length>30?emailText.substring(0,30)+'...':emailText,132,y);
-  y+=10;
+  doc.text('DATOS DEL CLIENTE', ML+3, cY+5.5);
 
-  // === PRODUCTS TABLE ===
-  const body=quote.map(q=>[q.nombre,q.qty,fmt(q.precio),fmt(q.qty*q.precio)]);
-
-  doc.autoTable({
-    startY:y,
-    head:[['Producto','Cant.','Precio Unit.','Subtotal']],
-    body,
-    headStyles:{fillColor:pdfAccent,textColor:(pdfAccent[0]>100&&pdfAccent[1]>100&&pdfAccent[2]<100)?[30,20,5]:[255,255,255],fontStyle:'bold',fontSize:9},
-    bodyStyles:{fontSize:9},
-    alternateRowStyles:{fillColor:[248,248,248]},
-    columnStyles:{1:{cellWidth:16,halign:'center'},2:{cellWidth:32,halign:'right'},3:{cellWidth:32,halign:'right'}},
-    margin:{left:12,right:12}
-  });
-
-  // === TOTALS BOX (corrected) ===
-  y=doc.lastAutoTable.finalY+6;
-  const boxX=100,boxW=98,lineH=7;
-  const totLines=[
-    {label:'Subtotal Base (sin INC)',val:fmt(baseSinInc),bold:false},
-    {label:'INC incluido (8%)',val:fmt(inc),bold:false,gray:true},
+  // Client rows
+  const clientData = [
+    ['Razón Social:', cNombre||'Sin especificar'],
+    ['NIT / Cédula:', cNit||'---', 'Contacto:', cContacto||'---'],
+    ['Teléfono:', cTel||'---', 'Email:', cEmail||'---'],
   ];
-  if(exclOn&&exclAmt>0){
-    totLines.push({label:'Exclusividad del espacio',val:fmt(exclAmt),bold:false,green:true});
-  }
-  if(inclProp){
-    totLines.push({label:'Propina (10% sobre base s/INC)',val:fmt(propina),bold:false,orange:true});
-  }
-  totLines.push({label:'TOTAL GENERAL',val:fmt(totalGeneral),bold:true,highlight:true});
-
-  const boxH=totLines.length*lineH+6;
-  doc.setFillColor(248,248,248);
-  doc.rect(boxX,y,boxW,boxH,'F');
-  doc.setDrawColor(...col);
-  doc.setLineWidth(0.5);
-  doc.rect(boxX,y,boxW,boxH);
-  let ty=y+5;
-  totLines.forEach(line=>{
-    if(line.highlight){
-      doc.setFillColor(...pdfAccent);
-      doc.rect(boxX,ty-4,boxW,lineH+1,'F');
-      // Use dark text on light accent (e.g. gold), white on dark accent
-      const accentBrightness=(pdfAccent[0]*299+pdfAccent[1]*587+pdfAccent[2]*114)/1000;
-      doc.setTextColor(accentBrightness>128?30:255,accentBrightness>128?20:255,accentBrightness>128?5:255);
-    }else if(line.orange){doc.setTextColor(230,126,34);
-    }else if(line.green){doc.setTextColor(...pdfAccent);
-    }else if(line.gray){doc.setTextColor(140,140,140);
-    }else{doc.setTextColor(50,50,50);}
-    doc.setFontSize(line.highlight?9.5:8);
-    doc.setFont(undefined,line.bold?'bold':'normal');
-    doc.text(line.label,boxX+3,ty);
-    doc.text(line.val,boxX+boxW-3,ty,{align:'right'});
-    ty+=lineH;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  const cLabelColor = [80,80,80];
+  const cValColor = [20,20,20];
+  clientData.forEach((line, i) => {
+    const ly = cY + 13 + i*7.5;
+    doc.setTextColor(...cLabelColor); doc.setFont('helvetica','bold');
+    doc.text(line[0], ML+3, ly);
+    doc.setTextColor(...cValColor); doc.setFont('helvetica','normal');
+    doc.text(line[1], ML+32, ly);
+    if(line[2]){
+      doc.setTextColor(...cLabelColor); doc.setFont('helvetica','bold');
+      doc.text(line[2], ML+UW/2, ly);
+      doc.setTextColor(...cValColor); doc.setFont('helvetica','normal');
+      doc.text(line[3], ML+UW/2+22, ly);
+    }
   });
-  doc.setTextColor(50,50,50);
-  y+=boxH+8;
 
-  // Note about INC
+  // ── PRODUCTS TABLE ───────────────────────────────────────────
+  const tY = cY + 42;
+  const cols = {prod:ML, cant:ML+108, price:ML+128, sub:PW-MR};
+  const colW = {prod:106, cant:18, price:28, sub:28};
+
+  // Table header
+  doc.setFillColor(...hC);
+  doc.rect(ML, tY, UW, 9, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8.5);
+  doc.text('Producto', cols.prod+3, tY+6);
+  doc.text('Cant.', cols.cant+colW.cant/2, tY+6, {align:'center'});
+  doc.text('Precio Unit.', cols.price+colW.price/2, tY+6, {align:'center'});
+  doc.text('Subtotal', cols.sub, tY+6, {align:'right'});
+
+  // Product rows
+  let py = tY + 9;
+  const rowH = 8;
+  quote.forEach((item, i) => {
+    const bg = i%2===0 ? [255,255,255] : [248,248,248];
+    doc.setFillColor(...bg);
+    doc.rect(ML, py, UW, rowH, 'F');
+    // Bottom border
+    doc.setDrawColor(220,220,220);
+    doc.setLineWidth(0.2);
+    doc.line(ML, py+rowH, ML+UW, py+rowH);
+
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    // Product name in accent color
+    doc.setTextColor(...aC);
+    doc.text(item.nombre.substring(0,46), cols.prod+3, py+5.5);
+    doc.setTextColor(55,55,55);
+    doc.text(String(item.qty), cols.cant+colW.cant/2, py+5.5, {align:'center'});
+    doc.text(fmtM(item.precio), cols.price+colW.price/2, py+5.5, {align:'center'});
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(30,30,30);
+    doc.text(fmtM(item.precio*item.qty), cols.sub, py+5.5, {align:'right'});
+    py += rowH;
+  });
+
+  // ── TOTALS BOX ───────────────────────────────────────────────
+  const totX = ML + UW*0.45;
+  const totW = UW*0.55;
+  let ty = py + 6;
+  const totRowH = 7.5;
+
+  // Totals box border
+  doc.setDrawColor(...aC);
+  doc.setLineWidth(0.5);
+  const numTotRows = (inclProp?3:2) + (exclAmt>0?1:0);
+  const totBoxH = numTotRows * totRowH + 10;
+  doc.rect(totX, ty-4, totW, totBoxH, 'S');
+
+  // Subtotal Base
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(55,55,55);
+  doc.text('Subtotal Base (sin INC)', totX+4, ty+1.5);
+  doc.setTextColor(20,20,20);
+  doc.text(fmtM(baseSinInc), totX+totW-3, ty+1.5, {align:'right'});
+  ty += totRowH;
+
+  // INC
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(130,130,130);
+  doc.text('INC incluido (8%)', totX+4, ty+1.5);
+  doc.text(fmtM(inc), totX+totW-3, ty+1.5, {align:'right'});
+  ty += totRowH;
+
+  // Exclusividad (if applicable)
+  if(exclAmt > 0){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(55,55,55);
+    doc.text('Exclusividad del espacio', totX+4, ty+1.5);
+    doc.setTextColor(20,20,20);
+    doc.text(fmtM(exclAmt), totX+totW-3, ty+1.5, {align:'right'});
+    ty += totRowH;
+  }
+
+  // Propina
+  if(inclProp){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...aC);
+    doc.text('Propina (10% sobre base s/INC)', totX+4, ty+1.5);
+    doc.text(fmtM(propina), totX+totW-3, ty+1.5, {align:'right'});
+    ty += totRowH;
+  }
+
+  // TOTAL GENERAL
+  doc.setFillColor(...hC);
+  doc.rect(totX, ty-1, totW, 10, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(10);
+  doc.text('TOTAL GENERAL', totX+4, ty+6.5);
+  doc.text(fmtM(totalGeneral), totX+totW-3, ty+6.5, {align:'right'});
+
+  // ── FOOTER ───────────────────────────────────────────────────
+  const footY = Math.max(ty + 20, PH - 25);
+  doc.setFont('helvetica','italic');
   doc.setFontSize(7);
   doc.setTextColor(140,140,140);
-  doc.setFont(undefined,'italic');
-  doc.text('* Los precios incluyen Impuesto Nacional al Consumo (INC 8%). Propina calculada sobre alimentos y bebidas, excluye exclusividad.',12,y);
-  y+=6;
+  const footNote = '* Los precios incluyen Impuesto Nacional al Consumo (INC 8%). Propina calculada sobre alimentos y bebidas, excluye exclusividad.';
+  doc.text(footNote, ML, footY, {maxWidth: UW});
 
-  // === OBSERVATIONS ===
-  if(obs){
-    if(y>240){doc.addPage();y=20;}
-    doc.setFontSize(9);doc.setFont(undefined,'bold');doc.setTextColor(50,50,50);
-    doc.text('Observaciones:',12,y);
-    doc.setFont(undefined,'normal');
-    const obsL=doc.splitTextToSize(obs,180);
-    doc.text(obsL,12,y+5);
-    y+=5+obsL.length*4;
-  }
+  // ─────────────────────────────────────────────────────────────
 
-  // === EXCLUSIVITY HIGHLIGHT ===
-  if(exclOn&&exclAmt>0){
-    y+=4;
-    const lc=col.map(c=>Math.min(c+180,255));
-    doc.setFillColor(...lc);
-    doc.rect(12,y-3,186,10,'F');
-    doc.setTextColor(...col);
-    doc.setFontSize(9);doc.setFont(undefined,'bold');
-    doc.text('★ EVENTO CON EXCLUSIVIDAD DEL ESPACIO: '+fmt(exclAmt)+' (no incluida en base de propina)',14,y+4);
-  }
-
-  // === FOOTER ===
-  doc.setFontSize(7);
-  doc.setTextColor(150,150,150);
-  doc.setFont(undefined,'normal');
-  doc.text('Cotización '+quoteNum+' | '+cfg.name+' | '+fecha,105,288,{align:'center'});
-
-  // === SAVE ===
-  const safeCliente=cNombre.replace(/[^a-z0-9áéíóúñàèìòù ]/gi,'').trim().replace(/\s+/g,'_').substring(0,30);
   const filename='COT-'+quoteNum+'-'+safeCliente+'.pdf';
   doc.save(filename);
   // Save to Google Sheets
@@ -784,6 +858,7 @@ async function generatePDF(){
     setTimeout(loadHistory,1500);
   }
   toast('PDF '+quoteNum+' generado con éxito','ok');
+
 }
 document.getElementById('brandSel').addEventListener('change',e=>{
   const val=e.target.value;
