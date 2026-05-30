@@ -495,7 +495,7 @@ async function generatePDF(){
   doc.rect(0,0,210,36,'F');
 
   // Try to load logo
-  const logoUrl='/logos/'+cfg.logoKey+'.png';
+  const logoUrl='/'+cfg.logoKey+'.png';
   let logoB64=null;
   try{logoB64=await imgToBase64(logoUrl);}catch(e){}
 
