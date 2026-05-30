@@ -1,3 +1,8 @@
+
+  <div class="nav-btns">
+    <button class="nav-btn active" id="btnViewQuotes" onclick="switchView('quotes')">Cotizador</button>
+    <button class="nav-btn" id="btnViewHistory" onclick="switchView('history')">Historial</button>
+  </div>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -108,6 +113,46 @@ input:checked+.slider:before{transform:translateX(22px)}
 #toast.ok{background:#27ae60}
 #toast.err{background:#e74c3c}
 @media(max-width:600px){.filters-bar{padding:10px 12px;gap:8px}.filter-group{max-width:100%}.search-wrap{max-width:100%}.cform-grid{grid-template-columns:1fr}}
+
+/* ---- HISTORY SECTION ---- */
+.hist-section{max-width:1320px;margin:0 auto;padding:0 20px 30px;display:none}
+.hist-section.active{display:block}
+.hist-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.hist-top h2{font-size:1rem;font-weight:800;color:var(--text);margin:0}
+.hist-search{flex:1;min-width:200px;max-width:340px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;outline:none;font-family:inherit;background:#fff}
+.hist-search:focus{border-color:var(--br)}
+.hist-filter-sel{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.83rem;outline:none;background:#fff;cursor:pointer}
+.hist-filter-sel:focus{border-color:var(--br)}
+.hist-reload{padding:8px 14px;border-radius:8px;border:1.5px solid var(--br);background:transparent;color:var(--br);font-size:.8rem;font-weight:700;cursor:pointer;margin-left:auto}
+.hist-reload:hover{background:var(--bg-warm)}
+.hist-table-wrap{overflow-x:auto;border-radius:10px;box-shadow:var(--shadow)}
+.hist-table{width:100%;border-collapse:collapse;font-size:.84rem;background:var(--card)}
+.hist-table thead th{padding:10px 14px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border);background:var(--card);white-space:nowrap;position:sticky;top:0}
+.hist-table tbody tr{border-bottom:1px solid #f0f0f0;transition:background .15s;cursor:pointer}
+.hist-table tbody tr:hover{background:var(--bg-warm)}
+.hist-table td{padding:9px 14px;vertical-align:middle}
+.hbadge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:700;background:var(--tag-bg);color:var(--tag-color)}
+.htotal{font-weight:800;color:var(--text)}
+.hacts{display:flex;gap:6px;white-space:nowrap}
+.hact{padding:4px 10px;border-radius:6px;border:none;font-size:.72rem;font-weight:700;cursor:pointer}
+.hact.view{background:var(--header-bg);color:#fff}
+.hact.dup{background:transparent;border:1.5px solid var(--br);color:var(--br)}
+.hact.dup:hover{background:var(--bg-warm)}
+.hist-empty{text-align:center;padding:40px;color:var(--muted);font-size:.9rem}
+.nav-btns{display:flex;gap:8px;margin-left:auto}
+.nav-btn{padding:6px 16px;border-radius:8px;border:none;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s}
+.nav-btn.active{background:var(--header-bg);color:#fff}
+.nav-btn:not(.active){background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.nav-btn:not(.active):hover{border-color:var(--br);color:var(--br)}
+/* Modal */
+.hmodal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px}
+.hmodal{background:#fff;border-radius:12px;max-width:600px;width:100%;max-height:90vh;overflow:auto;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.hmodal h3{font-size:1.1rem;font-weight:800;margin-bottom:16px;color:var(--text)}
+.hmodal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:16px}
+.hmodal-field label{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;display:block}
+.hmodal-field span{font-size:.88rem;color:var(--text);font-weight:600}
+.hmodal-close{float:right;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);padding:0 4px}
+.tab-hist-btn{display:none}
 </style>
 </head>
 <body>
@@ -233,6 +278,49 @@ input:checked+.slider:before{transform:translateX(22px)}
     </div>
   </div>
 </main>
+
+<!-- HISTORY SECTION -->
+<section class="hist-section" id="histSection">
+  <div class="hist-top">
+    <h2>📋 Historial de Cotizaciones</h2>
+    <input class="hist-search" id="histSearch" placeholder="Buscar por cliente, NIT, ID o marca..." oninput="filterHistory()"/>
+    <select class="hist-filter-sel" id="histBrandFilter" onchange="filterHistory()">
+      <option value="">Todas las marcas</option>
+      <option value="Malanga">Malanga</option>
+      <option value="Rocoto">Rocoto</option>
+      <option value="Hot Wings">Hot Wings</option>
+    </select>
+    <button class="hist-reload" onclick="loadHistory()">↺ Actualizar</button>
+  </div>
+  <div class="hist-table-wrap">
+    <table class="hist-table">
+      <thead>
+        <tr>
+          <th>ID Cotización</th>
+          <th>Fecha</th>
+          <th>Marca</th>
+          <th>Cliente</th>
+          <th>NIT</th>
+          <th>Total General</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="histBody">
+        <tr><td colspan="8" class="hist-empty">Cargando historial...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<!-- DETAIL MODAL -->
+<div class="hmodal-bg" id="hmodalBg" style="display:none" onclick="if(event.target===this)closeHModal()">
+  <div class="hmodal" id="hmodalContent">
+    <button class="hmodal-close" onclick="closeHModal()">✕</button>
+    <h3 id="hmodalTitle">Detalle de Cotización</h3>
+    <div class="hmodal-grid" id="hmodalGrid"></div>
+    <div id="hmodalProds"></div>
+  </div>
+</div>
 <div id="toast"></div>
 <script>
 let allProducts=[],quote=[],activeCat='';
@@ -648,6 +736,25 @@ async function generatePDF(){
   const safeCliente=cNombre.replace(/[^a-z0-9áéíóúñàèìòù ]/gi,'').trim().replace(/\s+/g,'_').substring(0,30);
   const filename='COT-'+quoteNum+'-'+safeCliente+'.pdf';
   doc.save(filename);
+  // Save to Google Sheets
+  saveToSheets({
+    id: quoteNum,
+    consec: quoteNum,
+    marca: cfg.name,
+    cliente: cNombre,
+    nit: cNIT,
+    contacto: cContacto,
+    telefono: cTel,
+    correo: cEmail,
+    subtotal: baseSinInc,
+    inc: inc,
+    exclusividad: exclAmt,
+    basePropina: propinaBase,
+    propina: inclProp ? propina : 0,
+    total: totalGeneral,
+    observaciones: cObs,
+    productos: quote.map(q => q.nombre + ' x' + q.qty).join(', ')
+  });
   toast('PDF '+quoteNum+' generado con éxito','ok');
 }
 document.getElementById('brandSel').addEventListener('change',e=>{
@@ -692,6 +799,151 @@ document.getElementById('bclr').addEventListener('click',()=>{
   renderQuote();
   toast('Cotización limpiada','ok');
 });
+
+
+// ============================================================
+// HISTORY — Google Sheets integration
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxz_WI1Rj-rlb5nQW1Lrnp5HSWDYaXh6osI6Lq4V9ryxnys1YItbaUmFAJqyABXVf9KzQ/exec';
+let _histData = [];
+let _currentView = 'quotes'; // 'quotes' | 'history'
+
+function switchView(view){
+  _currentView = view;
+  const main = document.querySelector('main');
+  const hist = document.getElementById('histSection');
+  const btnQ = document.getElementById('btnViewQuotes');
+  const btnH = document.getElementById('btnViewHistory');
+  if(view === 'history'){
+    if(main) main.style.display = 'none';
+    if(hist) hist.classList.add('active');
+    if(btnQ) { btnQ.classList.remove('active'); }
+    if(btnH) { btnH.classList.add('active'); }
+    loadHistory();
+  } else {
+    if(main) main.style.display = '';
+    if(hist) hist.classList.remove('active');
+    if(btnQ) { btnQ.classList.add('active'); }
+    if(btnH) { btnH.classList.remove('active'); }
+  }
+}
+
+async function loadHistory(){
+  const tbody = document.getElementById('histBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="8" class="hist-empty">⏳ Cargando...</td></tr>';
+  try {
+    const res = await fetch(GAS_URL + '?t=' + Date.now());
+    const json = await res.json();
+    if(json.ok){
+      _histData = json.data || [];
+      renderHistory(_histData);
+    } else {
+      if(tbody) tbody.innerHTML = '<tr><td colspan="8" class="hist-empty">⚠️ Error al cargar: ' + (json.error||'desconocido') + '</td></tr>';
+    }
+  } catch(e){
+    if(tbody) tbody.innerHTML = '<tr><td colspan="8" class="hist-empty">⚠️ No se pudo conectar al historial.</td></tr>';
+  }
+}
+
+function fmt2(n){ return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:0,maximumFractionDigits:0}).format(n||0); }
+
+function renderHistory(data){
+  const tbody = document.getElementById('histBody');
+  if(!tbody) return;
+  if(!data || data.length===0){
+    tbody.innerHTML = '<tr><td colspan="8" class="hist-empty">📭 No hay cotizaciones en el historial aún.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map((row,i) => {
+    const id = row['ID Cotizacion']||'—';
+    const fecha = row['Fecha']||'—';
+    const marca = row['Marca']||'—';
+    const cliente = row['Cliente']||'—';
+    const nit = row['NIT']||'—';
+    const total = row['Total General']||0;
+    const estado = row['Estado']||'Generada';
+    return '<tr onclick="viewHistDetail('+i+')">' +
+      '<td><strong style="color:var(--br)">' + id + '</strong></td>' +
+      '<td>' + fecha + '</td>' +
+      '<td><span class="hbadge">' + marca + '</span></td>' +
+      '<td>' + cliente + '</td>' +
+      '<td>' + nit + '</td>' +
+      '<td class="htotal">' + fmt2(total) + '</td>' +
+      '<td><span style="font-size:.72rem;color:var(--muted)">' + estado + '</span></td>' +
+      '<td><div class="hacts">' +
+        '<button class="hact view" onclick="event.stopPropagation();viewHistDetail('+i+')" title="Ver detalle">👁 Ver</button>' +
+        '<button class="hact dup" onclick="event.stopPropagation();duplicateQuote('+i+')" title="Duplicar cotización">⧉ Duplicar</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function filterHistory(){
+  const q = (document.getElementById('histSearch')||{}).value||'';
+  const brand = (document.getElementById('histBrandFilter')||{}).value||'';
+  const filtered = _histData.filter(row => {
+    const text = [row['ID Cotizacion'],row['Cliente'],row['NIT'],row['Marca']].join(' ').toLowerCase();
+    const matchQ = !q || text.indexOf(q.toLowerCase()) !== -1;
+    const matchB = !brand || (row['Marca']||'').indexOf(brand) !== -1;
+    return matchQ && matchB;
+  });
+  renderHistory(filtered);
+}
+
+function viewHistDetail(idx){
+  const row = _histData[idx];
+  if(!row) return;
+  document.getElementById('hmodalTitle').textContent = 'Cotización ' + (row['ID Cotizacion']||'');
+  const fields = [
+    ['Fecha',row['Fecha']||'—'],['Hora',row['Hora']||'—'],
+    ['Marca',row['Marca']||'—'],['Estado',row['Estado']||'—'],
+    ['Cliente',row['Cliente']||'—'],['NIT',row['NIT']||'—'],
+    ['Contacto',row['Contacto']||'—'],['Teléfono',row['Telefono']||'—'],
+    ['Correo',row['Correo']||'—'],['Observaciones',row['Observaciones']||'—'],
+    ['Subtotal Base',fmt2(row['Subtotal'])],['INC (8%)',fmt2(row['INC'])],
+    ['Exclusividad',fmt2(row['Exclusividad'])],['Base Propina',fmt2(row['Base Propina'])],
+    ['Propina (10%)',fmt2(row['Propina'])],['Total General',fmt2(row['Total General'])]
+  ];
+  document.getElementById('hmodalGrid').innerHTML = fields.map(([l,v]) =>
+    '<div class="hmodal-field"><label>' + l + '</label><span>' + v + '</span></div>'
+  ).join('');
+  const prods = row['Productos'] || '';
+  document.getElementById('hmodalProds').innerHTML = prods ?
+    '<hr style="margin:12px 0;border:none;border-top:1px solid var(--border)"><label style="font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase">Productos</label><p style="font-size:.84rem;margin-top:6px">' + prods + '</p>' : '';
+  document.getElementById('hmodalBg').style.display = 'flex';
+}
+
+function closeHModal(){
+  document.getElementById('hmodalBg').style.display = 'none';
+}
+
+function duplicateQuote(idx){
+  const row = _histData[idx];
+  if(!row) return;
+  // Switch to quotes view and pre-fill client data
+  switchView('quotes');
+  setTimeout(() => {
+    const f = (id,v) => { const el=document.getElementById(id); if(el) el.value=v||''; };
+    f('clientNombre', row['Cliente']);
+    f('clientNIT', row['NIT']);
+    f('clientContacto', row['Contacto']);
+    f('clientTel', row['Telefono']);
+    f('clientEmail', row['Correo']);
+    f('clientObs', 'Duplicado de cotización ' + (row['ID Cotizacion']||'') + '. ' + (row['Observaciones']||''));
+    showToast('Datos del cliente copiados. Selecciona marca y agrega productos.', 'ok');
+  }, 300);
+}
+
+// ---- Save to Sheets after PDF ----
+async function saveToSheets(payload){
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'Content-Type': 'application/json'}
+    });
+  } catch(e){ /* silent fail — PDF already generated */ }
+}
 </script>
 </body>
 </html>
