@@ -852,7 +852,7 @@ async function generatePDF(){
     basePropina: propinaBase,
     propina: inclProp ? propina : 0,
     total: totalGeneral,
-    observaciones: cObs,
+    observaciones: obs,
     productos: quote.map(q => q.nombre + ' x' + q.qty).join(', ')
   });
     quoteSaved=true;
@@ -914,7 +914,7 @@ document.getElementById('bsave').addEventListener('click', async () => {
   const cContacto=document.getElementById('cContacto').value.trim();
   const cTel=document.getElementById('cTel').value.trim();
   const cEmail=document.getElementById('cEmail').value.trim();
-  const cObs=document.getElementById('cObs')?document.getElementById('cObs').value.trim():'';
+  const obs=document.getElementById('obs')?document.getElementById('obs').value.trim():'';
   await saveToSheets({
     id:currentQuoteId,
     consec:currentQuoteId,
@@ -930,7 +930,7 @@ document.getElementById('bsave').addEventListener('click', async () => {
     basePropina:propinaBase,
     propina:inclProp?propina:0,
     total:totalGeneral,
-    observaciones:cObs,
+    observaciones:obs,
     productos:quote.map(q=>q.nombre+' x'+q.qty).join(', ')
   });
   quoteSaved=true;
