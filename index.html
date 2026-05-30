@@ -178,20 +178,11 @@ async function loadBrand(brand){
   document.getElementById('pcont').innerHTML='<div class="smsg"><div class="spin"></div><br>Cargando productos...</div>';
   document.getElementById('ftabs').innerHTML='';
   try{
-    var q=encodeURIComponent("SELECT * WHERE B = '"+brand+"'");
-    var sn=encodeURIComponent(SHEET_NAME);
-    var url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+sn+'&tq='+q;
+    var url='/api/data?brand='+encodeURIComponent(brand);
     var res=await fetch(url);
-    var txt=await res.text();
-    var json=parseGviz(txt);
-    S.all=json.table.rows.map(function(r){
-      return{
-        tarifa:r.c[1]?String(r.c[1].v||''):'',
-        familia:r.c[2]?String(r.c[2].v||'OTROS').toUpperCase():'OTROS',
-        articulo:r.c[3]?String(r.c[3].v||''):'',
-        precio:r.c[4]?parseFloat(String(r.c[4].v||'0').replace(/[^0-9.]/g,''))||0:0
-      };
-    }).filter(function(p){return p.articulo&&p.precio>0});
+    var json=await res.json();
+    if(!json.ok)throw new Error(json.error||'Error del servidor');
+    S.all=json.rows;
     if(!S.all.length)throw new Error('Sin datos para esta tarifa');
     var fams=['TODOS'];
     S.all.forEach(function(p){if(fams.indexOf(p.familia)<0)fams.push(p.familia);});
