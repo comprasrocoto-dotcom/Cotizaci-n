@@ -742,7 +742,7 @@ async function generatePDF(){
     consec: quoteNum,
     marca: cfg.name,
     cliente: cNombre,
-    nit: cNIT,
+    nit: cNit,
     contacto: cContacto,
     telefono: cTel,
     correo: cEmail,
@@ -930,7 +930,7 @@ function duplicateQuote(idx){
     f('clientTel', row['Telefono']);
     f('clientEmail', row['Correo']);
     f('clientObs', 'Duplicado de cotización ' + (row['ID Cotizacion']||'') + '. ' + (row['Observaciones']||''));
-    showToast('Datos del cliente copiados. Selecciona marca y agrega productos.', 'ok');
+    toast('Datos del cliente copiados. Selecciona marca y agrega productos.', 'ok');
   }, 300);
 }
 
