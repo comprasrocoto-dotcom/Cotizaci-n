@@ -141,6 +141,8 @@ input:checked+.slider:before{transform:translateX(22px)}
 .hact.view{background:var(--header-bg);color:#fff}
 .hact.dup{background:transparent;border:1.5px solid var(--br);color:var(--br)}
 .hact.dup:hover{background:var(--bg-warm)}
+.hact.pdf{background:transparent;border:1.5px solid var(--br);color:var(--br)}
+.hact.pdf:hover{background:var(--bg-warm)}
 .hist-empty{text-align:center;padding:40px;color:var(--muted);font-size:.9rem}
 .nav-btns{display:flex;gap:8px;margin-left:auto}
 .nav-btn{padding:6px 16px;border-radius:8px;border:none;font-size:.8rem;font-weight:700;cursor:pointer;transition:background .2s}
@@ -1037,6 +1039,7 @@ function renderHistory(data){
       '<td><span style="font-size:.72rem;color:var(--muted)">' + estado + '</span></td>' +
       '<td><div class="hacts">' +
         '<button class="hact view" onclick="event.stopPropagation();viewHistDetail('+i+')" title="Ver detalle">👁 Ver</button>' +
+        '<button class="hact pdf" onclick="event.stopPropagation();downloadPDFFromHistory('+i+')" title="Descargar PDF">📄 PDF</button>' +
         '<button class="hact dup" onclick="event.stopPropagation();duplicateQuote('+i+')" title="Duplicar cotización">⧉ Duplicar</button>' +
       '</div></td>' +
     '</tr>';
@@ -1100,6 +1103,175 @@ function duplicateQuote(idx){
 }
 
 // ---- Save to Sheets after PDF ----
+async function downloadPDFFromHistory(idx){
+  const row = _histData[idx];
+  if(!row) return;
+  const {jsPDF}=window.jspdf;
+  const marcaName = row['Marca']||'';
+  let brandKey = Object.keys(BRAND_CONFIG).find(k=>BRAND_CONFIG[k].name===marcaName) || 'TARIFA MALANGA';
+  const cfg = BRAND_CONFIG[brandKey]||BRAND_CONFIG['TARIFA MALANGA'];
+  const col = cfg.col;
+  const pdfAccent = cfg.accent||cfg.col;
+  const cNombre = row['Cliente']||'Sin especificar';
+  const cNit = row['NIT']||'';
+  const cContacto = row['Contacto']||'';
+  const cTel = row['Telefono']||'';
+  const cEmail = row['Correo']||'';
+  const obs = row['Observaciones']||'';
+  const baseSinInc = parseFloat(row['Subtotal'])||0;
+  const inc = parseFloat(row['INC'])||0;
+  const exclAmt = parseFloat(row['Exclusividad'])||0;
+  const propina = parseFloat(row['Propina'])||0;
+  const inclProp = propina > 0;
+  const totalGeneral = parseFloat(row['Total General'])||0;
+  const productTotal = baseSinInc + inc;
+  const prodStr = row['Productos']||'';
+  const quoteItems = prodStr ? prodStr.split(', ').map(p=>{
+    const m = p.match(/^(.+) x(\d+)$/);
+    return m ? {nombre:m[1], qty:parseInt(m[2]), precio:0} : {nombre:p, qty:1, precio:0};
+  }) : [];
+  const quoteNum = row['ID Cotizacion']||'—';
+  let fecha;
+  try{ fecha = new Date(row['Fecha']).toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'}); } catch(e){ fecha = new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'}); }
+  const safeCliente = (cNombre||'cliente').replace(/[^a-zA-Z0-9]/g,'-').substring(0,30);
+  const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const logoUrl = '/'+cfg.logoKey+'.png';
+  let logoB64 = null;
+  try{logoB64 = await imgToBase64(logoUrl);}catch(e){}
+  const hC = col;
+  const aC = pdfAccent;
+  const PW = 210, PH = 297;
+  const ML = 15, MR = 15;
+  const UW = PW - ML - MR;
+  const fmtM = n => {
+    if(!n && n!==0) return '---';
+    return '$'+Math.round(n).toLocaleString('es-CO');
+  };
+  doc.setFillColor(...hC);
+  doc.rect(0,0,PW,36,'F');
+  if(logoB64){ try{doc.addImage(logoB64,'PNG',ML,7,28,26,'','FAST');}catch(e){} }
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.text(cfg.name.toUpperCase(), ML+32, 17);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text('Cotización Nº '+quoteNum, ML+32, 25);
+  doc.setFontSize(8.5);
+  doc.text('Fecha: '+fecha, PW-MR, 12, {align:'right'});
+  doc.text(fecha, PW-MR, 21, {align:'right'});
+  const cY = 44;
+  doc.setFillColor(...hC);
+  doc.rect(ML, cY, 42, 7, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8);
+  doc.text('DATOS DEL CLIENTE', ML+3, cY+5);
+  doc.setDrawColor(...aC);
+  doc.setLineWidth(0.4);
+  doc.rect(ML, cY+7, UW, 34);
+  const clientData = [
+    ['Razón Social:', cNombre||'Sin especificar', null, null],
+    ['NIT / Cédula:', cNit||'---', 'Contacto:', cContacto||'---'],
+    ['Teléfono:', cTel||'---', 'Email:', cEmail||'---'],
+  ];
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  const cLabelColor = [80,80,80];
+  const cValColor = [20,20,20];
+  clientData.forEach((line, i) => {
+    const ly = cY + 13 + i*7.5;
+    doc.setTextColor(...cLabelColor); doc.setFont('helvetica','bold');
+    doc.text(line[0], ML+3, ly);
+    doc.setTextColor(...cValColor); doc.setFont('helvetica','normal');
+    doc.text(line[1], ML+32, ly);
+    if(line[2]){
+      doc.setTextColor(...cLabelColor); doc.setFont('helvetica','bold');
+      doc.text(line[2], ML+UW/2, ly);
+      doc.setTextColor(...cValColor); doc.setFont('helvetica','normal');
+      doc.text(line[3], ML+UW/2+22, ly);
+    }
+  });
+  const tY = cY + 42;
+  const cols = {prod:ML, cant:ML+108, price:ML+128, sub:PW-MR};
+  const colW = {prod:106, cant:18, price:28, sub:28};
+  doc.setFillColor(...hC);
+  doc.rect(ML, tY, UW, 9, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(9);
+  doc.text('Producto', cols.prod+3, tY+6);
+  doc.text('Cant.', cols.cant+colW.cant/2, tY+6, {align:'center'});
+  doc.text('Precio Unit.', cols.price+colW.price/2, tY+6, {align:'center'});
+  doc.text('Subtotal', cols.sub, tY+6, {align:'right'});
+  let rowY = tY + 9;
+  const rowH = 8;
+  quoteItems.forEach((item, i) => {
+    if(i%2===1){doc.setFillColor(245,245,245);doc.rect(ML,rowY,UW,rowH,'F');}
+    doc.setTextColor(...aC);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8.5);
+    doc.text(item.nombre||'—', cols.prod+3, rowY+5.5);
+    doc.setTextColor(20,20,20);
+    doc.setFont('helvetica','normal');
+    doc.text(String(item.qty), cols.cant+colW.cant/2, rowY+5.5, {align:'center'});
+    doc.text('---', cols.price+colW.price/2, rowY+5.5, {align:'center'});
+    doc.text('---', cols.sub, rowY+5.5, {align:'right'});
+    rowY += rowH;
+  });
+  doc.setDrawColor(220,220,220);
+  doc.setLineWidth(0.2);
+  doc.line(ML, rowY, PW-MR, rowY);
+  const totW = 95;
+  const totX = PW - MR - totW;
+  const totRowH = 9;
+  let ty = rowY + 6;
+  doc.setDrawColor(...aC);
+  doc.setLineWidth(0.5);
+  doc.line(totX, ty-4, PW-MR, ty-4);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(20,20,20);
+  doc.text('Subtotal Base (sin INC)', totX+4, ty+1.5);
+  doc.text(fmtM(baseSinInc), totX+totW-3, ty+1.5, {align:'right'});
+  ty += totRowH;
+  doc.setFontSize(8);
+  doc.setTextColor(130,130,130);
+  doc.text('INC incluido (8%)', totX+4, ty+1.5);
+  doc.text(fmtM(inc), totX+totW-3, ty+1.5, {align:'right'});
+  ty += totRowH;
+  if(exclAmt > 0){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(55,55,55);
+    doc.text('Exclusividad del espacio', totX+4, ty+1.5);
+    doc.setTextColor(20,20,20);
+    doc.text(fmtM(exclAmt), totX+totW-3, ty+1.5, {align:'right'});
+    ty += totRowH;
+  }
+  if(inclProp){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...aC);
+    doc.text('Propina (10% sobre base s/INC)', totX+4, ty+1.5);
+    doc.text(fmtM(propina), totX+totW-3, ty+1.5, {align:'right'});
+    ty += totRowH;
+  }
+  doc.setFillColor(...hC);
+  doc.rect(totX, ty-1, totW, 10, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(10);
+  doc.text('TOTAL GENERAL', totX+4, ty+6.5);
+  doc.text(fmtM(totalGeneral), totX+totW-3, ty+6.5, {align:'right'});
+  doc.setFont('helvetica','italic');
+  doc.setFontSize(7);
+  doc.setTextColor(130,130,130);
+  doc.text('* Los precios incluyen Impuesto Nacional al Consumo (INC 8%). Propina calculada sobre alimentos y bebidas, excluye exclusividad.', ML, PH-10);
+  const filename = 'Cotizacion-'+quoteNum+'-'+safeCliente+'.pdf';
+  doc.save(filename);
+  toast('PDF '+quoteNum+' descargado', 'ok');
+}
 async function saveToSheets(payload){
   try {
     const params = new URLSearchParams({action:'save',data:JSON.stringify(payload)});
