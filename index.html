@@ -824,8 +824,32 @@ async function generatePDF(){
   doc.text('TOTAL GENERAL', totX+4, ty+6.5);
   doc.text(fmtM(totalGeneral), totX+totW-3, ty+6.5, {align:'right'});
 
+  // ── OBSERVACIONES ────────────────────────────────────────────
+  let obsBlockH = 0;
+  if(obs){
+    const obsLines = doc.splitTextToSize(obs, UW - 6);
+    obsBlockH = obsLines.length * 5 + 14;
+  }
+
   // ── FOOTER ───────────────────────────────────────────────────
-  const footY = Math.max(ty + 20, PH - 25);
+  const footY = Math.max(ty + (obs ? obsBlockH + 8 : 20), PH - 25);
+  if(obs){
+    const obsY = footY - obsBlockH - 4;
+    doc.setDrawColor(...aC);
+    doc.setLineWidth(0.5);
+    doc.rect(ML, obsY, UW, obsBlockH, 'S');
+    doc.setFillColor(...hC);
+    doc.rect(ML, obsY, 42, 7, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.text('OBSERVACIONES', ML+3, obsY+5);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(30,30,30);
+    const obsLines2 = doc.splitTextToSize(obs, UW - 6);
+    doc.text(obsLines2, ML+3, obsY+12);
+  }
   doc.setFont('helvetica','italic');
   doc.setFontSize(7);
   doc.setTextColor(140,140,140);
@@ -1264,6 +1288,25 @@ async function downloadPDFFromHistory(idx){
   doc.setFontSize(10);
   doc.text('TOTAL GENERAL', totX+4, ty+6.5);
   doc.text(fmtM(totalGeneral), totX+totW-3, ty+6.5, {align:'right'});
+  // ── OBSERVACIONES (historial) ───────────────────────────────
+  if(obs){
+    const obsLinesH = doc.splitTextToSize(obs, UW - 6);
+    const obsBlockHH = obsLinesH.length * 5 + 14;
+    const obsYH = PH - 10 - obsBlockHH - 8;
+    doc.setDrawColor(...aC);
+    doc.setLineWidth(0.5);
+    doc.rect(ML, obsYH, UW, obsBlockHH, 'S');
+    doc.setFillColor(...hC);
+    doc.rect(ML, obsYH, 42, 7, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.text('OBSERVACIONES', ML+3, obsYH+5);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(30,30,30);
+    doc.text(obsLinesH, ML+3, obsYH+12);
+  }
   doc.setFont('helvetica','italic');
   doc.setFontSize(7);
   doc.setTextColor(130,130,130);
